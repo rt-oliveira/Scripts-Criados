@@ -88,9 +88,7 @@ Confirme.
 Para cada uma dessas ações, o caminho será o mesmo, com apenas passando parâmetros diferentes entre eles. Os valores configurados podem ser vistos nas imagens abaixo:
 
 ![Configuração da ação "Open"](/images\passo6-1-ove.png)
-
 ![Configuração da ação "View"](/images\passo6-2-ove.png)
-
 ![Configuração da ação "Edit"](/images\passo6-3-ove.png)
 
 Observação: O parâmetro `%p` que está sendo usado significa, dentro do Double Commander, a lista de arquivos selecionados.
