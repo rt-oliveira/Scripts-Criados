@@ -57,11 +57,11 @@ Baseando-se pelo Double Commander:
 
 1. Com o Double Commander, vá no menu *Configuração*, e selecione o item *Associações de ficheiros...*
 
-![Primeiro passo do processo de implantação.](/images/passo1-ove.png)
+![Primeiro passo do processo de implantação.](/images/passo1-ove.PNG)
 
 2. Ao escolher a opção, aparecerá uma tela similar a imagem abaixo:
 
-![Tela de associação de ficheiros aberta, no Double Commander.](/images/passo2-ove.png)
+![Tela de associação de ficheiros aberta, no Double Commander.](/images/passo2-ove.PNG)
 
 Escolha a opção *Adicionar* (sublinhada na imagem).
 
@@ -69,14 +69,14 @@ Escolha a opção *Adicionar* (sublinhada na imagem).
 
 4. Confirme, e assim criará um espaço para configuração de associação de arquivos, como na imagem abaixo.
 
-![Criado "OVE", um espaço onde será criada a associação de arquivos.](/images\passo4-ove.png)
+![Criado "OVE", um espaço onde será criada a associação de arquivos.](/images/passo4-ove.png)
 
 Com ele criado, primeiro é preciso escolher as extensões que farão parte desta associação. Selecione a opção *Adicionar* como mostrado acima.
 
 5. Aparecerá uma janela, pedindo o nome de uma extensão para adicionar na lista de extensões cobertas nesse espaço. Digite *default*
     - O programa entenderá *default* não como uma extensão específica, e sim como a definição padrão a ser usada em todas as extensões, dentro do programa.
   
-![Extensão "default" digitado na janela de extensões do espaço de associação](/images\passo5-ove.png)
+![Extensão "default" digitado na janela de extensões do espaço de associação](/images/passo5-ove.png)
 
 Confirme.
 
@@ -87,9 +87,9 @@ Confirme.
         - *Editar* (quando, ao selecionar um arquivo, aperta *F4*).
 Para cada uma dessas ações, o caminho será o mesmo, com apenas passando parâmetros diferentes entre eles. Os valores configurados podem ser vistos nas imagens abaixo:
 
-![Configuração da ação "Open"](/images\passo6-1-ove.png)
-![Configuração da ação "View"](/images\passo6-2-ove.png)
-![Configuração da ação "Edit"](/images\passo6-3-ove.png)
+![Configuração da ação "Open"](/images/passo6-1-ove.png)
+![Configuração da ação "View"](/images/passo6-2-ove.png)
+![Configuração da ação "Edit"](/images/passo6-3-ove.png)
 
 Observação: O parâmetro `%p` que está sendo usado significa, dentro do Double Commander, a lista de arquivos selecionados.
 
@@ -97,5 +97,5 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
 
 ## Códigos-fonte
 
-- [Para ver o script "Controller", que executa as ações.](/Batch%20Script\OVE.bat)
-- [Para ver o script "Alias", que configura as ações.](/Batch%20Script\OVE%20-%20Alias.bat)
+- [Para ver o script "Controller", que executa as ações.](/Batch%20Script/OVE.bat)
+- [Para ver o script "Alias", que configura as ações.](/Batch%20Script/OVE%20-%20Alias.bat)
