@@ -57,11 +57,11 @@ Baseando-se pelo Double Commander:
 
 1. Com o Double Commander, vá no menu *Configuração*, e selecione o item *Associações de ficheiros...*
 
-![Primeiro passo do processo de implantação.](/images/passo1-ove.PNG)
+![Primeiro passo do processo de implantação.](/images/passo1-ove.png)
 
 2. Ao escolher a opção, aparecerá uma tela similar a imagem abaixo:
 
-![Tela de associação de ficheiros aberta, no Double Commander.](/images/passo2-ove.PNG)
+![Tela de associação de ficheiros aberta, no Double Commander.](/images/passo2-ove.png)
 
 Escolha a opção *Adicionar* (sublinhada na imagem).
 
@@ -87,9 +87,9 @@ Confirme.
         - *Editar* (quando, ao selecionar um arquivo, aperta *F4*).
 Para cada uma dessas ações, o caminho será o mesmo, com apenas passando parâmetros diferentes entre eles. Os valores configurados podem ser vistos nas imagens abaixo:
 
-![Configuração da ação "Open"](/images/passo6-1-ove.PNG)
-![Configuração da ação "View"](/images/passo6-2-ove.PNG)
-![Configuração da ação "Edit"](/images/passo6-3-ove.PNG)
+![Configuração da ação "Open"](/images/passo6-1-ove.png)
+![Configuração da ação "View"](/images/passo6-2-ove.png)
+![Configuração da ação "Edit"](/images/passo6-3-ove.png)
 
 Observação: O parâmetro `%p` que está sendo usado significa, dentro do Double Commander, a lista de arquivos selecionados.
 
