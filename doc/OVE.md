@@ -87,9 +87,9 @@ Confirme.
         - *Editar* (quando, ao selecionar um arquivo, aperta *F4*).
 Para cada uma dessas ações, o caminho será o mesmo, com apenas passando parâmetros diferentes entre eles. Os valores configurados podem ser vistos nas imagens abaixo:
 
-![Configuração da ação "Open"](/images/passo6-1-ove.png)
-![Configuração da ação "View"](/images/passo6-2-ove.png)
-![Configuração da ação "Edit"](/images/passo6-3-ove.png)
+![Configuração da ação "Open"](/images/passo6-1-ove.PNG)
+![Configuração da ação "View"](/images/passo6-2-ove.PNG)
+![Configuração da ação "Edit"](/images/passo6-3-ove.PNG)
 
 Observação: O parâmetro `%p` que está sendo usado significa, dentro do Double Commander, a lista de arquivos selecionados.
 
