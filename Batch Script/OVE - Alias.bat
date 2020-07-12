@@ -16,7 +16,9 @@
 ::    *comando* = inicio *programa* [*parâmetros*] ###
 ::      - Onde:
 ::        - "inicio"    : é um prefixo, que é substituído no script "controller".
-::        - *programa*  : é o nome do programa que quer rodar.
+::        - *programa*  : é o nome do programa que quer rodar. Ele pode ser:
+::                          - O caminho completo de um programa, ou;
+::                          - Um programa que está em uma pasta que está na variável de ambiente PATH do Windows.
 ::        - *parâmetros*: são os parâmetros que podem ser passados para *programa*.
 ::        - ###         : é uma string que é usada como "placeholder" para depois ser substituída pelo caminho do arquivo.
 ::
