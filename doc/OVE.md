@@ -106,3 +106,5 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
     - [Para ver o script "Controller", que executa as ações.](/Batch%20Script/OVE.bat)
     - [Para ver o script "Alias", que configura as ações.](/Batch%20Script/OVE%20-%20Alias.bat)
 - Em VBScript
+    - [Para ver o script "Controller", que executa as ações.](/VBScript/OVE.vbs)
+    - [Para ver o arquivo de configuração .INI, que configura as ações.](/INI/Config%20OVE.ini)
