@@ -95,7 +95,12 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
 
 7. E assim já está configurado o OVE no Double Commander. Agora, para cada vez que for querer abrir, ver ou editar um arquivo, o programa delegará ao OVE a execução dos programas adequados, de acordos com as ações disponíveis e as extensões dos arquivos passados.
 
+## Observações Finais
+
+- A documentação inteira do script foi focada nas três ações (*open*, *view* e *edit*), porém este script pode ser customizado para adaptar novos tipos de ações, de acordo com a necessidade.
+
 ## Códigos-fonte
 
-- [Para ver o script "Controller", que executa as ações.](/Batch%20Script/OVE.bat)
-- [Para ver o script "Alias", que configura as ações.](/Batch%20Script/OVE%20-%20Alias.bat)
+- Em Batch Script
+    - [Para ver o script "Controller", que executa as ações.](/Batch%20Script/OVE.bat)
+    - [Para ver o script "Alias", que configura as ações.](/Batch%20Script/OVE%20-%20Alias.bat)
