@@ -99,6 +99,10 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
 
 - A documentação inteira do script foi focada nas três ações (*open*, *view* e *edit*), porém este script pode ser customizado para adaptar novos tipos de ações, de acordo com a necessidade.
 - Inicialmente o script foi desenvolvido em Batch Script, porém posteriormente foi adaptado para VBScript também.
+    - Neste caso, ao invés de haver um script *Alias*, há um arquivo de configuração .INI onde há as ações configuradas.
+- [Edit 26/09/2020] O script foi mais uma vez adaptado, e também foi modernizado, para a linguagem AutoHotkey.
+    - Essa adaptação foi feita, pois esta linguagem possui recursos que não eram vistos na linguagem VBScript, como a leitura de arquivos .INI, e o tratamento mais simples de arquivos de atalho (.lnk).
+    - Além disso, na versão do script nesta linguagem foi adicionado um mecanismo para adição de novas ações sem precisar editar diretamente o arquivo de configurações.
 
 ## Códigos-fonte
 
@@ -108,3 +112,6 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
 - Em VBScript
     - [Para ver o script "Controller", que executa as ações.](/VBScript/OVE.vbs)
     - [Para ver o arquivo de configuração .INI, que configura as ações.](/INI/Config%20OVE.ini)
+- Em AutoHotkey
+    - [Para ver o script "Controller", que executa as ações.](/AutoHotkey/OVE.ahk)
+    - [Para ver o arquivo de configuração .INI, que configura as ações.](/INI/Config%20OVE%20(AHK).ini)
