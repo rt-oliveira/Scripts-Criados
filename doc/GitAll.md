@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Esse script foi script para tentar ajudar no processo de adicionar e dar commit em todos os arquivos modificados em um repositório Git.
+Esse script foi criado para tentar ajudar no processo de adicionar e dar commit em todos os arquivos modificados em um repositório Git.
 
 ## Motivação
 
