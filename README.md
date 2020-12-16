@@ -4,7 +4,7 @@
 
 ---
 
-Este repositório terá o objetivo de mostrar alguns scripts que criei, para os mais variados objetivos.
+Este repositório terá o objetivo de mostrar alguns scripts e pequenos programas que criei, para os mais variados objetivos.
 
 Logo abaixo são mostrados os script que estão neste repositório, além de uma breve descrição sobre eles.
 
