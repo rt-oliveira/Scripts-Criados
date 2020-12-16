@@ -16,6 +16,12 @@ Esse foi um script criado para tentar automatizar o processo de commit e push de
 
 Para mais informações, [clique aqui](doc/GitAll.md).
 
+## LeIni
+
+Esse foi um pequeno programa que foi criado para ler arquivos .ini.
+
+Para mais informações, [clique aqui](doc/LeIni.md).
+
 ## OVE (Open View Edit)
 
 Esse script criado em batch script (e posteriormente também criado em VBScript) tem o objetivo de permitir a criação de associações de programas padrão para as extensões do computador. Ele torna essas associações portáteis e independentes do sistema operacional.
