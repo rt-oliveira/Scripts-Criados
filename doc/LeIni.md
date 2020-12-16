@@ -44,4 +44,4 @@ LeIni *arquivo* *seção* *chave*
 
 ---
 
-[Código-fonte do programa](C%2B%2B/LeIni.cpp)
+[Código-fonte do programa](/C%2B%2B/LeIni.cpp)
