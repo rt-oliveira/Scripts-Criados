@@ -24,6 +24,6 @@ Para mais informações, [clique aqui](doc/LeIni.md).
 
 ## OVE (Open View Edit)
 
-Esse script criado em batch script (e posteriormente também criado em VBScript) tem o objetivo de permitir a criação de associações de programas padrão para as extensões do computador. Ele torna essas associações portáteis e independentes do sistema operacional.
+Esse script criado em batch script (e posteriormente também criado em VBScript e em AutoHotkey) tem o objetivo de permitir a criação de associações de programas padrão para as extensões do computador. Ele torna essas associações portáteis e independentes do sistema operacional.
 
 Para mais informações, [clique aqui](doc/OVE.md).
