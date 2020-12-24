@@ -103,6 +103,7 @@ Observação: O parâmetro `%p` que está sendo usado significa, dentro do Doubl
 - [Edit 26/09/2020] O script foi mais uma vez adaptado, e também foi modernizado, para a linguagem AutoHotkey.
     - Essa adaptação foi feita, pois esta linguagem possui recursos que não eram vistos na linguagem VBScript, como a leitura de arquivos .INI, e o tratamento mais simples de arquivos de atalho (.lnk).
     - Além disso, na versão do script nesta linguagem foi adicionado um mecanismo para adição de novas ações sem precisar editar diretamente o arquivo de configurações.
+    - **Esta é a versão mais recomendada para uso.**
 
 ## Códigos-fonte
 
