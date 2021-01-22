@@ -1,12 +1,12 @@
-;@Ahk2Exe-SetDescription Script que ajuda na customizaÁ„o de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.0.0.0
+Ôªø;@Ahk2Exe-SetDescription Script que ajuda na customiza√ß√£o de comandos para os arquivos.
+;@Ahk2Exe-SetVersion 2.1.0.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
 /*
   OVE (Open-View-Edit)
-  Esta È a vers„o em AutoHotkey do script criado inicialmente em Batch Script, e depois em VBScript.
-  Este È o script que atua como 'controller', apenas acionando as aÁıes definidas em um arquivo .ini.
+  Esta √© a vers√£o em AutoHotkey do script criado inicialmente em Batch Script, e depois em VBScript.
+  Este √© o script que atua como 'controller', apenas acionando as a√ß√µes definidas em um arquivo .ini.
 */
 
 #Warn
@@ -14,13 +14,13 @@ DetectHiddenText, on
 
 Testar()
 
-; Duas vari·veis globais
+; Duas vari√°veis globais
 global acao
 global localIni
 global NvAcao
 localIni = %A_ScriptDir%\Config OVE.ini
 if (!FileExist(localIni)){
-  MsgBox 48, , O arquivo de configuraÁ„o n„o foi encontrado. Ele ser· criado.
+  MsgBox 48, , O arquivo de configura√ß√£o n√£o foi encontrado. Ele ser√° criado.
   FileAppend, , %localIni%, UTF-8-RAW
 }
 ;
@@ -28,103 +28,62 @@ ConfigurarVariaveisAmbiente()
 ;
 global ParaTodos
 ParaTodos := false
-ExecutarAcoes()
+;
+for i, arquivo in A_Args
+{
+	if (i == 1)
+		continue
+	else{
+		if (acao == "-la")
+		{
+			ListarAcoes(arquivo)
+			Pause, Toggle
+		}
+		;
+		extensao := RecuperarExtensao(arquivo)
+		if (SubStr(extensao, -3) == ".lnk")
+			TratarAtalho(arquivo)
+		else
+			RecuperarEExecutarComando(acao, extensao, arquivo)
+		;
+		if (!ParaTodos)
+			acao := "-la"
+	}
+}
+exitapp
+	
 ;----------------------------------------------------------------
-Testar(){
-  ; Tem, no mÌnimo, 2 argumentos
-  if (A_Args.Length() < 2)
-    ErroOVE()
-  ;
-  ; … uma aÁ„o v·lida?
-  ; Uma aÁ„o sÛ tem letras e n˙meros.
-  acao := A_Args[1]
-  if (!RegExMatch(acao, "^[a-zA-Z0-9]+$")
-      and acao != "-la")
-    ErroOVE()
-}
 
-; Mensagem de erro, informando que deve ser passado, pelo menos, 1 aÁ„o e 1 arquivo,
-; para o script ser executado.
-ErroOVE(){
-  msg = 
-  (
-    N„o foi passada aÁ„o ou arquivo para o programa.
-
-O programa deve ser usado da seguinte forma:
-OVE acao programa1 [programa2 programa3 ...]
-
-Onde 'acao' pode ser:
-- Um termo que contenha somente letras (sem acentos) e n˙meros, ou;
-- '-la', que vai listar as aÁıes.
-  )
-  MsgBox, 16, OVE, %msg%
-  exitapp
-}
-
-; Na vers„o em Batch desse script, sÛ era aceito uma aÁ„o para arquivos atalho (.lnk), a aÁ„o 'open'.
-; PorÈm, tanto na vers„o em VBScript, como nessa, em AHK, isso foi ampliado, de modo a permitir qualquer
-; aÁ„o.
+; Na vers√£o em Batch desse script, s√≥ era aceito uma a√ß√£o para arquivos atalho (.lnk), a a√ß√£o 'open'.
+; Por√©m, tanto na vers√£o em VBScript, como nessa, em AHK, isso foi ampliado, de modo a permitir qualquer
+; a√ß√£o.
 TratarAtalho(arquivo){
-  local comandoAtalho
-  FileGetShortcut, %arquivo%, destino, , argumentos
-  ; Se o atalho tiver argumentos, geralmente isso vai se referir a um atalho de um programa com argumentos.
-  ; Com isso, caso o atalho tenha argumentos, simplesmente executa o programa com os seus devidos argumentos.
-  if (Trim(argumentos) <> "")
-  {
-    if (FileExist(destino))
-      Run, "%destino%" %argumentos%
-  } else {
-    ; Aqui eu vejo para o que o atalho est· "apontando".
-    tipo := FileExist(destino)
-    if (tipo = "D")     ; … diretÛrio
-    {
-      ; Se estiver apontando para um diretÛrio, ser· procurado o comando padr„o para abrir pastas.
-      ; Geralmente este comando ser· para abrir a pasta em um explorador de arquivos.
-      ; Esta È a ˙nica associaÁ„o com chave padr„o que h· no script (todos os atalhos de pastas usar„o
-      ; o comando associado a chave 'openPastas'.
-      IniRead, comandoAtalho, %localIni%, open, openPastas
-      comandoAtalho = %comandoAtalho%
-      if (comandoAtalho = "ERROR"){
-        comandoAtalho := AcaoNaoDefinida("Pastas")
-        if (comandoAtalho != "ERROR")
-            ExecutarComando(comandoAtalho, arquivo)
-      }
-      else
-        ExecutarComando(comandoAtalho, destino)
-    } 
-    else                ; … arquivo
-    {
-      ; Se estiver apontando para um arquivo, simplesmente executa o mesmo script, passando a aÁ„o que j·
-      ; havia passado, mas agora para o destino do atalho.
-      if A_IsCompiled
-        comandoAtalho := """" A_ScriptFullPath """ " acao " ###" 
-      else
-        comandoAtalho := """" A_AhkPath """" " """ A_ScriptFullPath """ " acao " ###"
-      ExecutarComando(comandoAtalho, destino)
-    }
-  }
+	FileGetShortcut, %arquivo%, destino, , argumentos
+	;
+	extensaoAtalho := RecuperarExtensao(destino)
+	RecuperarEExecutarComando(acao, extensaoAtalho, destino, argumentos)
 }
 
-; Caso ainda n„o exista um comando associado a uma aÁ„o/extens„o, ser· dada a oportunidade
-; do usu·rio poder cadastrar, sem precisar acessar o arquivo de configuraÁ„o diretamente,
-; um comando para aquela associaÁ„o.
+; Caso ainda n√£o exista um comando associado a uma a√ß√£o/extens√£o, ser√° dada a oportunidade
+; do usu√°rio poder cadastrar, sem precisar acessar o arquivo de configura√ß√£o diretamente,
+; um comando para aquela associa√ß√£o.
 AcaoNaoDefinida(extensao){
   msgbox, 36, ,
   (
-  A aÁ„o %acao%%extensao% n„o foi definida.
+  A a√ß√£o %acao%%extensao% n√£o foi definida.
 Deseja definir agora?
   )
   IfMsgBox, Yes
   {
     while (1=1){
-      InputBox, comandoASerFeito, AÁ„o n„o definida, Digite o comando para a aÁ„o %acao%%extensao%
+      InputBox, comandoASerFeito, A√ß√£o n√£o definida, Digite o comando para a a√ß√£o %acao%%extensao%
       if ErrorLevel
         return "ERROR"
       ;
       comandoASerFeito = %comandoASerFeito%
       ;
       if (comandoASerFeito = ""){
-        MsgBox, 36, , Confirma a inclus„o de comando vazio para a aÁ„o %acao%%extensao%?
+        MsgBox, 36, , Confirma a inclus√£o de comando vazio para a a√ß√£o %acao%%extensao%?
         ifMsgBox, Yes
         {
           IniWrite, %comandoASerFeito%, %localIni%, %acao%, %acao%%extensao%
@@ -132,7 +91,7 @@ Deseja definir agora?
         }
       } else {
         If (!InStr(comandoASerFeito, "###")){
-          msgbox, 16, , Em comandos n„o-vazios, a m·scara ### deve existir.
+          msgbox, 16, , Em comandos n√£o-vazios, a m√°scara ### deve existir.
           Continue
         }
         ;
@@ -149,9 +108,11 @@ Deseja definir agora?
 }
 
 
-; Esta È a funÁ„o que efetivamente executar· os comandos vindos das associaÁıes.
-ExecutarComando(comando, arquivo){
+; Esta √© a fun√ß√£o que efetivamente executar√° os comandos vindos das associa√ß√µes.
+ExecutarComando(comando, arquivo, argumentos := ""){
   comando := StrReplace(comando, "###", """" arquivo """")
+  if (trim(argumentos) <> "")
+    comando := comando . " " . argumentos
   ;
   try
   {
@@ -164,16 +125,16 @@ ExecutarComando(comando, arquivo){
     (
     Erro na abertura do programa.
           
-Verifique sua configuraÁ„o de associaÁ„o.
+Verifique sua configura√ß√£o de associa√ß√£o.
 Comando: %comando%
     )
     exitapp
   }
 }
 
-; Caso 'acao' seja '-la', eu abro uma janela que listo as aÁıes j· cadastradas no
-; arquivo de configuraÁıes. O usu·rio pode ent„o escolher uma das aÁıes mostradas
-; para usar no arquivo atual, e pode usar esta mesma aÁ„o para todos os prÛximos
+; Caso 'acao' seja '-la', eu abro uma janela que listo as a√ß√µes j√° cadastradas no
+; arquivo de configura√ß√µes. O usu√°rio pode ent√£o escolher uma das a√ß√µes mostradas
+; para usar no arquivo atual, e pode usar esta mesma a√ß√£o para todos os pr√≥ximos
 ; arquivos passados.
 ListarAcoes(arquivo){
   static outSecoes
@@ -184,16 +145,16 @@ ListarAcoes(arquivo){
     Gui, Add, Text, , Pasta: %arquivo%
   else
     Gui, Add, Text, , Arquivo: %arquivo%
-  Gui, Add, Text, , AÁıes:
+  Gui, Add, Text, , A√ß√µes:
   loop, parse, outSecoes, `n
   {
     Gui, Add, Button, w350 gBotao, %A_LoopField%
   }
-  Gui, Add, Button, R0.5 gNovaAcao, Nova AÁ„o:
+  Gui, Add, Button, R0.5 gNovaAcao, Nova A√ß√£o:
   Gui, Add, Edit, x+m R0.5 vNvAcao
-  Gui, Add, Checkbox, x-m vParaTodos, V·lido para este e os prÛximos arquivos?
+  Gui, Add, Checkbox, x-m vParaTodos, V√°lido para este e os pr√≥ximos arquivos?
   Gui, -MaximizeBox AlwaysOnTop
-  Gui, Show, , Lista de aÁıes
+  Gui, Show, , Lista de a√ß√µes
   return
 
 GuiClose:
@@ -209,15 +170,15 @@ return
 NovaAcao:
 Gui, Submit, NoHide
 if (Trim(NvAcao) == ""){
-  MsgBox 262144, , N„o h· aÁ„o preenchida. Por favor, preencha a aÁ„o.
+  MsgBox 262144, , N√£o h√° a√ß√£o preenchida. Por favor, preencha a a√ß√£o.
   return
 }
 if (!RegExMatch(NvAcao, "^[a-zA-Z0-9]+$")){
-  MsgBox 262144, , %NvAcao% È inv·lido. AÁıes sÛ podem ter letras e n˙meros.
+  MsgBox 262144, , %NvAcao% √© inv√°lido. A√ß√µes s√≥ podem ter letras e n√∫meros.
   return
 }
 if (InStr(outSecoes . "`n", NvAcao . "`n")){
-  MsgBox 262144, , %NvAcao% j· existe.
+  MsgBox 262144, , %NvAcao% j√° existe.
   return
 }
 acao := NvAcao
@@ -226,70 +187,80 @@ Pause, Toggle
 return
 }
 
-ExecutarAcoes(){
-  for i, arquivo in A_Args
-  {
-    if (i = 1)
-      continue
-    else
-    {
-      if (acao == "-la")
-      {
-        ListarAcoes(arquivo)
-        Pause, Toggle
-      }
-      ;
-      if (FileExist(arquivo) == "D")
-        extensao := "\Pastas"
-      else {
-        SplitPath, arquivo, nomeArquivo, , extensao
-        StringLower, extensao, extensao
-        ;
-        extensao := (extensao == "") ? "\"nomeArquivo : "."extensao
-      }
-      ;
-      if (extensao = ".lnk")
-        TratarAtalho(arquivo)
-      else {
-        IniRead, comando, %localIni%, %acao%, %acao%%extensao%
-        comando = %comando% ; Para remover espaÁos em branco no inÌcio e no fim da string
-        if (comando == "ERROR"){
-          comando := AcaoNaoDefinida(extensao)
-          if (comando != "ERROR")
-            ExecutarComando(comando, arquivo)
-        }
-        else if (comando <> "")
-          ExecutarComando(comando, arquivo)
-      }
-      ;
-      if (!ParaTodos){
-        acao := "-la"
-      }
-    }
-  }
-  exitapp
+RecuperarExtensao(arquivo){
+	if (FileExist(arquivo) == "D")
+		return "Pastas"
+	else{
+		SplitPath, arquivo, nomeArquivo, , tmpExt
+		StringLower, tmpExt, tmpExt
+		;
+		return (tmpExt == "") ? "\"nomeArquivo : "."tmpExt
+	}
 }
 
-; Esta funÁ„o pfoi criada para permitir a execuÁ„o de programas sem precisar, muitas vezes,
-; ficar usando o caminho completo dele no arquivo de configuraÁ„o.
-; A partir dessa funÁ„o:
-;  - Os programas que ser„o usados podem estar na mesma pasta onde o script est· localizado.
-;  - Eles podem ser referenciados apenas pelo nome do execut·vel/atalho/...
+RecuperarEExecutarComando(acao, extensao, arquivo, argumentos := ""){
+	IniRead, comandoRecuperado, %localIni%, %acao%, %acao%%extensao%
+	comandoRecuperado = %comandoRecuperado% ; Para remover espa√ßos em branco no in√≠cio e no fim da string
+	if (comandoRecuperado == "ERROR"){
+		comandoRecuperado := AcaoNaoDefinida(extensao)
+		if (comando != "ERROR")
+			ExecutarComando(comandoRecuperado, arquivo, argumentos)
+	}
+	else if (comandoRecuperado <> "")
+		ExecutarComando(comandoRecuperado, arquivo, argumentos)
+}
+
+; Esta fun√ß√£o foi criada para permitir a execu√ß√£o de programas sem precisar, muitas vezes,
+; ficar usando o caminho completo dele no arquivo de configura√ß√£o.
+; A partir dessa fun√ß√£o:
+;  - Os programas que ser√£o usados podem estar na mesma pasta onde o script est√° localizado.
+;  - Eles podem ser referenciados apenas pelo nome do execut√°vel/atalho/...
 ConfigurarVariaveisAmbiente(){
-  ; Esta primeira parte permitir· aos programas poderem estar na mesma pasta do script
-  ; e apenas serem referenciados no arquivo de configuraÁ„o pelo seu nome.
-  EnvGet, dirPath, PATH
-  dirPath := dirPath ";" A_ScriptDir
-  EnvSet, PATH, %dirPath%
+  ; Esta primeira parte permitir√° aos programas poderem estar na mesma pasta do script
+  ; e apenas serem referenciados no arquivo de configura√ß√£o pelo seu nome.
+	EnvGet, dirPath, PATH
+	dirPath := dirPath ";" A_ScriptDir
+	EnvSet, PATH, %dirPath%
   ;
-  ; Esta segunda parte permitir· poder executar atalhos sem precisar colocar a extens„o
-  ; no comando. Isto È: para uma associaÁ„o cujo comando use o atalho 'teste.lnk', ao invÈs 
-  ; de usar a forma completo, usar· apenas o nome do atalho, ou seja, 'teste'.
-  EnvGet, varPathExt, PATHEXT
-  StringLower, varPathExt, varPathExt
-  if (Instr(varPathExt, ".lnk") = 0)
-  {
-    varPathExt := varPathExt ";.LNK"
-    EnvSet, PATHEXT, %varPathExt%
-  }
+  ; Esta segunda parte permitir√° poder executar atalhos sem precisar colocar a extens√£o
+  ; no comando. Isto √©: para uma associa√ß√£o cujo comando use o atalho 'teste.lnk', ao inv√©s 
+  ; de usar a forma completo, usar√° apenas o nome do atalho, ou seja, 'teste'.
+	EnvGet, varPathExt, PATHEXT
+	StringLower, varPathExt, varPathExt
+	if (Instr(varPathExt, ".lnk") = 0)
+	{
+		varPathExt := varPathExt ";.LNK"
+		EnvSet, PATHEXT, %varPathExt%
+	}
+}
+
+Testar(){
+  ; Tem, no m√≠nimo, 2 argumentos
+  if (A_Args.Length() < 2)
+    ErroOVE()
+  ;
+  ; √â uma a√ß√£o v√°lida?
+  ; Uma a√ß√£o s√≥ tem letras e n√∫meros.
+  acao := A_Args[1]
+  if (!RegExMatch(acao, "^[a-zA-Z0-9]+$")
+      and acao != "-la")
+    ErroOVE()
+}
+
+; Mensagem de erro, informando que deve ser passado, pelo menos, 1 a√ß√£o e 1 arquivo,
+; para o script ser executado.
+ErroOVE(){
+	msg = 
+  (
+    N√£o foi passada a√ß√£o ou arquivo para o programa.
+
+O programa deve ser usado da seguinte forma:
+OVE acao programa1 [programa2 programa3 ...]
+
+Onde 'acao' pode ser:
+- Um termo que contenha somente letras (sem acentos) e n√∫meros, ou;
+- '-la', que vai listar as a√ß√µes.
+  )
+	MsgBox, 16, OVE, %msg%
+	exitapp
 }
