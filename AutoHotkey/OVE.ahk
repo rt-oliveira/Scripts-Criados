@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que ajuda na customização de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.1.0.0
+;@Ahk2Exe-SetVersion 2.1.1.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -40,11 +40,11 @@ for i, arquivo in A_Args
 			Pause, Toggle
 		}
 		;
-		extensao := RecuperarExtensao(arquivo)
-		if (SubStr(extensao, -3) == ".lnk")
-			TratarAtalho(arquivo)
-		else
-			RecuperarEExecutarComando(acao, extensao, arquivo)
+		if (SubStr(arquivo, -3) == ".lnk") {
+          FileGetShortcut, %arquivo%, destino, , argumentos
+          RecuperarEExecutarComando(acao, destino, argumentos)
+        } else
+          RecuperarEExecutarComando(acao, arquivo)
 		;
 		if (!ParaTodos)
 			acao := "-la"
@@ -53,16 +53,6 @@ for i, arquivo in A_Args
 exitapp
 	
 ;----------------------------------------------------------------
-
-; Na versão em Batch desse script, só era aceito uma ação para arquivos atalho (.lnk), a ação 'open'.
-; Porém, tanto na versão em VBScript, como nessa, em AHK, isso foi ampliado, de modo a permitir qualquer
-; ação.
-TratarAtalho(arquivo){
-	FileGetShortcut, %arquivo%, destino, , argumentos
-	;
-	extensaoAtalho := RecuperarExtensao(destino)
-	RecuperarEExecutarComando(acao, extensaoAtalho, destino, argumentos)
-}
 
 ; Caso ainda não exista um comando associado a uma ação/extensão, será dada a oportunidade
 ; do usuário poder cadastrar, sem precisar acessar o arquivo de configuração diretamente,
@@ -78,7 +68,7 @@ Deseja definir agora?
     while (1=1){
       InputBox, comandoASerFeito, Ação não definida, Digite o comando para a ação %acao%%extensao%
       if ErrorLevel
-        return "ERROR"
+        return ""
       ;
       comandoASerFeito = %comandoASerFeito%
       ;
@@ -110,6 +100,9 @@ Deseja definir agora?
 
 ; Esta é a função que efetivamente executará os comandos vindos das associações.
 ExecutarComando(comando, arquivo, argumentos := ""){
+  if (trim(comando) == "")
+    return
+  ;
   comando := StrReplace(comando, "###", """" arquivo """")
   if (trim(argumentos) <> "")
     comando := comando . " " . argumentos
@@ -137,22 +130,22 @@ Comando: %comando%
 ; para usar no arquivo atual, e pode usar esta mesma ação para todos os próximos
 ; arquivos passados.
 ListarAcoes(arquivo){
-  static outSecoes
   IniRead, outSecoes, %localIni%
+  outSecoes := StrReplace(outSecoes, "`n", "|")
   ;
-  Gui, Font, s16, MS Sans Serif
+  tamanhoFonte := 16
+  tamanhoListBox := 50 * tamanhoFonte
+  ;
+  Gui, Font, s%tamanhoFonte%, MS Sans Serif
   if (FileExist(arquivo) == "D")
     Gui, Add, Text, , Pasta: %arquivo%
   else
     Gui, Add, Text, , Arquivo: %arquivo%
   Gui, Add, Text, , Ações:
-  loop, parse, outSecoes, `n
-  {
-    Gui, Add, Button, w350 gBotao, %A_LoopField%
-  }
-  Gui, Add, Button, R0.5 gNovaAcao, Nova Ação:
-  Gui, Add, Edit, x+m R0.5 vNvAcao
-  Gui, Add, Checkbox, x-m vParaTodos, Válido para este e os próximos arquivos?
+  Gui, Add, ListBox, x+m R10 Sort vacao gBotao w%tamanhoListBox%, %outSecoes%
+  Gui, Add, Button, xm R0.5 gNovaAcao, Nova Ação:
+  Gui, Add, Edit, x+m vNvAcao
+  Gui, Add, Checkbox, xm vParaTodos, Válido para este e os próximos arquivos?
   Gui, -MaximizeBox AlwaysOnTop
   Gui, Show, , Lista de ações
   return
@@ -162,7 +155,6 @@ exitapp
 
 Botao:
 Gui, Submit
-acao := A_GuiControl
 Gui, Destroy
 Pause, Toggle
 return
@@ -198,16 +190,15 @@ RecuperarExtensao(arquivo){
 	}
 }
 
-RecuperarEExecutarComando(acao, extensao, arquivo, argumentos := ""){
+RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
+    extensao := RecuperarExtensao(arquivo)
+	;
 	IniRead, comandoRecuperado, %localIni%, %acao%, %acao%%extensao%
 	comandoRecuperado = %comandoRecuperado% ; Para remover espaços em branco no início e no fim da string
-	if (comandoRecuperado == "ERROR"){
-		comandoRecuperado := AcaoNaoDefinida(extensao)
-		if (comando != "ERROR")
-			ExecutarComando(comandoRecuperado, arquivo, argumentos)
-	}
-	else if (comandoRecuperado <> "")
-		ExecutarComando(comandoRecuperado, arquivo, argumentos)
+	if (comandoRecuperado == "ERROR")
+      comandoRecuperado := AcaoNaoDefinida(extensao)
+    ;
+    ExecutarComando(comandoRecuperado, arquivo, argumentos)
 }
 
 ; Esta função foi criada para permitir a execução de programas sem precisar, muitas vezes,
