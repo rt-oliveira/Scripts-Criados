@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que ajuda na customização de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.1.1.0
+;@Ahk2Exe-SetVersion 2.1.2.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -19,10 +19,8 @@ global acao
 global localIni
 global NvAcao
 localIni = %A_ScriptDir%\Config OVE.ini
-if (!FileExist(localIni)){
-  MsgBox 48, , O arquivo de configuração não foi encontrado. Ele será criado.
+if (!FileExist(localIni))
   FileAppend, , %localIni%, UTF-8-RAW
-}
 ;
 ConfigurarVariaveisAmbiente()
 ;
@@ -130,6 +128,7 @@ Comando: %comando%
 ; para usar no arquivo atual, e pode usar esta mesma ação para todos os próximos
 ; arquivos passados.
 ListarAcoes(arquivo){
+  static outSecoes
   IniRead, outSecoes, %localIni%
   outSecoes := StrReplace(outSecoes, "`n", "|")
   ;
