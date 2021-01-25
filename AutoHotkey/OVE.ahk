@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que ajuda na customização de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.1.2.0
+;@Ahk2Exe-SetVersion 2.1.3.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -147,15 +147,24 @@ ListarAcoes(arquivo){
   Gui, Add, Checkbox, xm vParaTodos, Válido para este e os próximos arquivos?
   Gui, -MaximizeBox AlwaysOnTop
   Gui, Show, , Lista de ações
+  ;
+  Hotkey, IfWinActive, Lista de ações
+  HotKey, ~Enter, Botao
+  Hotkey, If
+  ;
   return
 
 GuiClose:
 exitapp
 
 Botao:
-Gui, Submit
-Gui, Destroy
-Pause, Toggle
+if (GetKeyState("Down") <> 1 and GetKeyState("Up") <> 1){
+  Gui, Submit, NoHide
+  if (Trim(acao) <> ""){
+    Gui, Destroy
+    Pause, Toggle
+  }
+}
 return
 
 NovaAcao:
