@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que ajuda na customização de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.1.3.0
+;@Ahk2Exe-SetVersion 2.2.0.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -9,23 +9,23 @@
   Este é o script que atua como 'controller', apenas acionando as ações definidas em um arquivo .ini.
 */
 
-#Warn
+#Warn UseUnsetLocal
 DetectHiddenText, on
 
 Testar()
 
-; Duas variáveis globais
-global acao
-global localIni
-global NvAcao
+; Três variáveis globais
+global acao, localIni, ParaTodos
+ParaTodos := True
+global tamanhoFonte := 16
+;
+; Na primeira execução do programa, o arquivo de configuração não existirá.
+; Com isso, ele será criado neste momento.
 localIni = %A_ScriptDir%\Config OVE.ini
 if (!FileExist(localIni))
   FileAppend, , %localIni%, UTF-8-RAW
 ;
 ConfigurarVariaveisAmbiente()
-;
-global ParaTodos
-ParaTodos := false
 ;
 for i, arquivo in A_Args
 {
@@ -33,12 +33,11 @@ for i, arquivo in A_Args
 		continue
 	else{
 		if (acao == "-la")
-		{
-			ListarAcoes(arquivo)
-			Pause, Toggle
-		}
+          acao := ListarAcoes(arquivo)
 		;
 		if (SubStr(arquivo, -3) == ".lnk") {
+          ; Em casos de atalhos do Windows, eu "abro" ele, para recuperar 
+          ; o destino dele e os seus argumentos.
           FileGetShortcut, %arquivo%, destino, , argumentos
           RecuperarEExecutarComando(acao, destino, argumentos)
         } else
@@ -51,50 +50,6 @@ for i, arquivo in A_Args
 exitapp
 	
 ;----------------------------------------------------------------
-
-; Caso ainda não exista um comando associado a uma ação/extensão, será dada a oportunidade
-; do usuário poder cadastrar, sem precisar acessar o arquivo de configuração diretamente,
-; um comando para aquela associação.
-AcaoNaoDefinida(extensao){
-  msgbox, 36, ,
-  (
-  A ação %acao%%extensao% não foi definida.
-Deseja definir agora?
-  )
-  IfMsgBox, Yes
-  {
-    while (1=1){
-      InputBox, comandoASerFeito, Ação não definida, Digite o comando para a ação %acao%%extensao%
-      if ErrorLevel
-        return ""
-      ;
-      comandoASerFeito = %comandoASerFeito%
-      ;
-      if (comandoASerFeito = ""){
-        MsgBox, 36, , Confirma a inclusão de comando vazio para a ação %acao%%extensao%?
-        ifMsgBox, Yes
-        {
-          IniWrite, %comandoASerFeito%, %localIni%, %acao%, %acao%%extensao%
-          return comandoASerFeito
-        }
-      } else {
-        If (!InStr(comandoASerFeito, "###")){
-          msgbox, 16, , Em comandos não-vazios, a máscara ### deve existir.
-          Continue
-        }
-        ;
-        if (comandoASerFeito != "###" and !Instr(comandoASerFeito, """", , , 2)){
-          msgbox, 16, , O programa deve estar entre aspas.
-          continue
-        }
-        ;
-        IniWrite, %comandoASerFeito%, %localIni%, %acao%, %acao%%extensao%
-        return comandoASerFeito
-      }
-    }
-  }
-}
-
 
 ; Esta é a função que efetivamente executará os comandos vindos das associações.
 ExecutarComando(comando, arquivo, argumentos := ""){
@@ -123,70 +78,11 @@ Comando: %comando%
   }
 }
 
-; Caso 'acao' seja '-la', eu abro uma janela que listo as ações já cadastradas no
-; arquivo de configurações. O usuário pode então escolher uma das ações mostradas
-; para usar no arquivo atual, e pode usar esta mesma ação para todos os próximos
-; arquivos passados.
-ListarAcoes(arquivo){
-  static outSecoes
-  IniRead, outSecoes, %localIni%
-  outSecoes := StrReplace(outSecoes, "`n", "|")
-  ;
-  tamanhoFonte := 16
-  tamanhoListBox := 50 * tamanhoFonte
-  ;
-  Gui, Font, s%tamanhoFonte%, MS Sans Serif
-  if (FileExist(arquivo) == "D")
-    Gui, Add, Text, , Pasta: %arquivo%
-  else
-    Gui, Add, Text, , Arquivo: %arquivo%
-  Gui, Add, Text, , Ações:
-  Gui, Add, ListBox, x+m R10 Sort vacao gBotao w%tamanhoListBox%, %outSecoes%
-  Gui, Add, Button, xm R0.5 gNovaAcao, Nova Ação:
-  Gui, Add, Edit, x+m vNvAcao
-  Gui, Add, Checkbox, xm vParaTodos, Válido para este e os próximos arquivos?
-  Gui, -MaximizeBox AlwaysOnTop
-  Gui, Show, , Lista de ações
-  ;
-  Hotkey, IfWinActive, Lista de ações
-  HotKey, ~Enter, Botao
-  Hotkey, If
-  ;
-  return
-
-GuiClose:
-exitapp
-
-Botao:
-if (GetKeyState("Down") <> 1 and GetKeyState("Up") <> 1){
-  Gui, Submit, NoHide
-  if (Trim(acao) <> ""){
-    Gui, Destroy
-    Pause, Toggle
-  }
-}
-return
-
-NovaAcao:
-Gui, Submit, NoHide
-if (Trim(NvAcao) == ""){
-  MsgBox 262144, , Não há ação preenchida. Por favor, preencha a ação.
-  return
-}
-if (!RegExMatch(NvAcao, "^[a-zA-Z0-9]+$")){
-  MsgBox 262144, , %NvAcao% é inválido. Ações só podem ter letras e números.
-  return
-}
-if (InStr("|" outSecoes "|", "|" NvAcao "|")){
-  MsgBox 262144, , %NvAcao% já existe.
-  return
-}
-acao := NvAcao
-Gui, Destroy
-Pause, Toggle
-return
-}
-
+; Aqui será recuperada a extensão do arquivo.
+; - Em casos de pastas, é usada uma "extensao" padrão chamada "Pastas"
+; - Em casos de arquivos:
+;   - Caso o arquivo tenha extensão, simplesmente o retorna;
+;   - Caso o arquivo não tenha, usa-se uma máscara padrão do tipo "\<nome do arquivo>"
 RecuperarExtensao(arquivo){
 	if (FileExist(arquivo) == "D")
 		return "Pastas"
@@ -198,13 +94,58 @@ RecuperarExtensao(arquivo){
 	}
 }
 
+/*
+  Modo de funcionamento do programa em cada arquivo:
+  - Há 2 tipos de comandos para cada ação:
+    - Os comandos específicos, que há 1 para cada extensão; 
+    - Os comandos globais, que há apenas 1 por ação. Eles são executados quando
+      não há comando específico determinado para aquela extensão.
+  Funcionamento:
+  1. Primeiro, é visto se foi configurado um comando específico naquela ação para
+     aquela extensão;
+    - Havendo, simplesmente o executa;
+    - Não havendo, siga para o passo 2.
+  2. Em casos em que não um comando específico configurado, é visto se foi configurado
+     um comando global para aquela ação.
+    - Havendo, será aberta a possibilidade de poder configurar um comando específico daquela
+      ação para aquela extensão
+      - Caso seja permitido perguntar, pois é possível desabilitar tal opção, fazendo com que
+        sempre force a executar o comando global para todas as extensões não configuradas naquela
+        ação.
+      - Caso configure um comando específico, este será rodado. Caso contrário, será rodado o comando
+        global.
+  3. Em casos em que não há nem um comando específico, nem um comando global, será dada a possibilidade
+     de criar um comando específico para aquela extensão (mas que pode vir a ser global da ação).
+*/
 RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
     extensao := RecuperarExtensao(arquivo)
 	;
 	IniRead, comandoRecuperado, %localIni%, %acao%, %acao%%extensao%
 	comandoRecuperado = %comandoRecuperado% ; Para remover espaços em branco no início e no fim da string
-	if (comandoRecuperado == "ERROR")
-      comandoRecuperado := AcaoNaoDefinida(extensao)
+	if (comandoRecuperado <> "ERROR"){
+      ExecutarComando(comandoRecuperado, arquivo, argumentos)
+      return
+    }
+    ;
+    IniRead, comandoRecuperado, %localIni%, %acao%, %acao%*
+    comandoRecuperado = %comandoRecuperado%
+    if (comandoRecuperado <> "ERROR"){
+      ;
+      IniRead, permissaoCadComandoEspec, %localIni%, %acao%, permissaoCadComandoEspec, S
+      if (permissaoCadComandoEspec == "S"){
+        if (VaiCadastrarAcao(arquivo, extensao, True) == "S"){
+          comandoCriado := CriarComandoAcao(arquivo, extensao, True)
+          comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
+        }
+      }
+    } else {
+      ;
+      comandoRecuperado := ""
+      if (VaiCadastrarAcao(arquivo, extensao, False) == "S"){
+        comandoCriado := CriarComandoAcao(arquivo, extensao, False)
+        comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
+      }
+    }
     ;
     ExecutarComando(comandoRecuperado, arquivo, argumentos)
 }
@@ -233,17 +174,16 @@ ConfigurarVariaveisAmbiente(){
 	}
 }
 
+; Para o programa funcionar, é preciso passar:
+; - Um comando, que pode ser:
+;   - Uma ação (composta por letras e números), ou;
+;   - -la, que é um argumento especial, que listará todos os comandos configurados.
+; - E uma lista de arquivos (com pelo menos 1 arquivo).
 Testar(){
-  ; Tem, no mínimo, 2 argumentos
-  if (A_Args.Length() < 2)
+  if ((A_Args.Length() < 2) or !(A_Args[1] ~= "^([a-zA-Z0-9]+)|(-la)$"))
     ErroOVE()
-  ;
-  ; É uma ação válida?
-  ; Uma ação só tem letras e números.
-  acao := A_Args[1]
-  if (!RegExMatch(acao, "^[a-zA-Z0-9]+$")
-      and acao != "-la")
-    ErroOVE()
+  else
+    acao := A_Args[1]
 }
 
 ; Mensagem de erro, informando que deve ser passado, pelo menos, 1 ação e 1 arquivo,
@@ -263,3 +203,6 @@ Onde 'acao' pode ser:
 	MsgBox, 16, OVE, %msg%
 	exitapp
 }
+
+#include ListarAcoes.ahk
+#include CadAcoes.ahk
