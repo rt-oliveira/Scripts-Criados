@@ -31,6 +31,7 @@ ListarAcoes(arquivo){
   return acaoEscolhida
 
 ListarAcoesGuiClose:
+ListarAcoesGuiEscape:
   exitapp
 
 NovaAcao:

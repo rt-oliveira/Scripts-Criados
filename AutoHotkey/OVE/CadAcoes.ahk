@@ -18,7 +18,7 @@ VaiCadastrarAcao(arquivo, extensao, temAcaoGlobal := False){
 		A ação %acao% tem um comando global, 
 mas não há um comando específico para a extensão %extensao%.
 
-Deseja cadastrar um comando específico para esta extensao?
+Deseja cadastrar um comando específico para esta extensão?
 		)
 	} else {
 		Gui, PerguntaAcaoNaoDefinida:Add, Text, ,
@@ -44,6 +44,7 @@ Deseja definir agora?
 	return vaiCriarAcao
 	
 PerguntaAcaoNaoDefinidaGuiClose:
+PerguntaAcaoNaoDefinidaGuiEscape:
 vaiCriarAcao := "N"
 Gui, Destroy
 Pause, Off
@@ -112,6 +113,7 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 		GuiControl, Focus, Edit1
 	if (!temAcaoGlobal)
 		Gui, Add, CheckBox, xm, Comando global da ação %acao%
+	Gui, Add, Text, xm, Dica: a máscara ### pode ser usada. Ela será substituída pelo caminho do arquivo.
 	;
 	Gui, Add, Button, Hidden Default gCopiaOuNovoComando, OK
 	Gui, Show, AutoSize , Cadastro de comando
@@ -120,6 +122,7 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 	return comando
 
 CadAcoesGuiClose:
+CadAcoesGuiEscape:
 	comando := ""
 	Gui, Destroy
 	Pause, Off
@@ -192,17 +195,12 @@ ehValidoNovoComando(comandoDigitado){
 			return True
 		else
 			return False
-	} else {
-		If (!InStr(comandoDigitado, "###")){
-          msgbox, 16, , Em comandos não-vazios, a máscara ### deve existir, pois ela é substituída pelo arquivo passado.
-          return False
-        }
-		;
-		if (comandoDigitado != "###" and !Instr(comandoDigitado, """", , , 2)){
-          msgbox, 16, , O programa deve estar entre aspas.
-          return False
-        }
-		;
-		return True
+	} 
+	;
+	if (comandoDigitado != "###" and !Instr(comandoDigitado, """", , , 2)){
+		msgbox, 16, , O programa deve estar entre aspas.
+		return False
 	}
+	;
+	return True
 }

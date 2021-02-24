@@ -1,5 +1,5 @@
-﻿;@Ahk2Exe-SetDescription Script que ajuda na customização de comandos para os arquivos.
-;@Ahk2Exe-SetVersion 2.2.0.0
+﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
+;@Ahk2Exe-SetVersion 2.2.1.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -9,6 +9,7 @@
   Este é o script que atua como 'controller', apenas acionando as ações definidas em um arquivo .ini.
 */
 
+#SingleInstance Off
 #Warn UseUnsetLocal
 DetectHiddenText, on
 
@@ -69,9 +70,9 @@ ExecutarComando(comando, arquivo, argumentos := ""){
     WinKill, ahk_pid %outPID%
     msgbox, 
     (
-    Erro na abertura do programa.
+    Erro ao executar comando.
           
-Verifique sua configuração de associação.
+Verifique o comando executado.
 Comando: %comando%
     )
     exitapp
