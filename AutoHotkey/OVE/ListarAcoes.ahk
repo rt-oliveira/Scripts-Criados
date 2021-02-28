@@ -18,7 +18,7 @@ ListarAcoes(arquivo){
   else
     Gui, Add, Text, , Arquivo: %arquivo%
   Gui, Add, Text, , Ações:
-  Gui, Add, ListBox, x+m R10 Sort w%tamanhoListBox%, %outSecoes%
+  Gui, Add, ListBox, x+m R10 Sort w%tamanhoListBox% gCliqueAcao, %outSecoes%
   Gui, Add, Button, xm R0.5 gNovaAcao, Nova Ação:
   Gui, Add, Edit, x+m
   Gui, Add, Checkbox, xm vParaTodos, Válido para este e os próximos arquivos?
@@ -47,7 +47,7 @@ NovaAcao:
 AcaoListaAcoes:
   Gui, Submit, NoHide
   ControlGetFocus, outFoco
-  ; Pôr para ver no caso de estar no CheckBox, vai usar oq?
+  ;
   if (outFoco == "Edit1"){
     if (!ValidaNovaAcao()){
       ControlFocus, Edit1
@@ -65,6 +65,12 @@ AcaoListaAcoes:
     Pause, Off
   }
   else if (outFoco == "Button2"){
+    /*
+      Caso esteja no checkbox, na ordem:
+        1. Vê se escolheu alguma ação no lista ações já cadastradas.
+        2. Caso não tenha nenhuma ação escolhida, vê se digitou alguma nova ação.
+        3. Em último caso, avisa para escolher alguma ação ou digitar uma nova ação.
+    */
     GuiControlGet, acaoEscolhida, , ListBox1
     if (Trim(acaoEscolhida) <> ""){
       Gui, Destroy
@@ -83,6 +89,14 @@ AcaoListaAcoes:
       Gui, Destroy
       Pause, Off
     }
+  }
+  return
+
+CliqueAcao:
+  if (A_GuiEvent == "DoubleClick"){
+    GuiControlGet, acaoEscolhida, , ListBox1
+    Gui, Destroy
+    Pause, Off
   }
   return
 }
