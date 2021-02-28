@@ -113,7 +113,7 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 		GuiControl, Focus, Edit1
 	if (!temAcaoGlobal)
 		Gui, Add, CheckBox, xm, Comando global da ação %acao%
-	Gui, Add, Text, xm, Dica: a máscara ### pode ser usada. Ela será substituída pelo caminho do arquivo.
+	Gui, Add, Text, xm, Dica: a máscara ### pode ser usada. Ela será substituída pelo caminho do arquivo/pasta.
 	;
 	Gui, Add, Button, Hidden Default gCopiaOuNovoComando, OK
 	Gui, Show, AutoSize , Cadastro de comando
