@@ -1,7 +1,7 @@
-/*
-	Nos casos em n„o h· comando especÌfico configuraÁ„o para a combinaÁ„o (aÁ„o+extens„o),
-	ser· mostrada uma tela, que ser· perguntado se deseja criar um comando, que pode ser
-	especÌfico, ou atÈ mesmo global.
+Ôªø/*
+	Nos casos em n√£o h√° comando espec√≠fico configura√ß√£o para a combina√ß√£o (a√ß√£o+extens√£o),
+	ser√° mostrada uma tela, que ser√° perguntado se deseja criar um comando, que pode ser
+	espec√≠fico, ou at√© mesmo global.
 */
 VaiCadastrarAcao(arquivo, extensao, temAcaoGlobal := False){
 	global tamanhoFonte
@@ -15,28 +15,28 @@ VaiCadastrarAcao(arquivo, extensao, temAcaoGlobal := False){
 	if (temAcaoGlobal){
 		Gui, PerguntaAcaoNaoDefinida:Add, Text, ,
 		(
-		A aÁ„o %acao% tem um comando global, 
-mas n„o h· um comando especÌfico para a extens„o %extensao%.
+		A a√ß√£o %acao% tem um comando global, 
+mas n√£o h√° um comando espec√≠fico para a extens√£o %extensao%.
 
-Deseja cadastrar um comando especÌfico para esta extens„o?
+Deseja cadastrar um comando espec√≠fico para esta extens√£o?
 		)
 	} else {
 		Gui, PerguntaAcaoNaoDefinida:Add, Text, ,
 		(
-		N„o est· definido um comando especÌfico para a combinaÁ„o %acao%%extensao%.
+		N√£o est√° definido um comando espec√≠fico para a combina√ß√£o %acao%%extensao%.
 		
 Deseja definir agora?
 		)
 	}
 	Gui, Add, Button, w500 Default gCadastrarAcao, Sim
-	Gui, Add, Button, w500 gNaoCadastrarAcao, N„o
+	Gui, Add, Button, w500 gNaoCadastrarAcao, N√£o
 	if (temAcaoGlobal)
-		Gui, Add, Button, w500 gNaoCadastrarNaoPerguntar, N„o, e n„o pergunte novamente
+		Gui, Add, Button, w500 gNaoCadastrarNaoPerguntar, N√£o, e n√£o pergunte novamente
 	Gui, -MaximizeBox AlwaysOnTop
 	if (temAcaoGlobal)
-		Gui, Show, , Comando especÌfico n„o definido
+		Gui, Show, , Comando espec√≠fico n√£o definido
 	else
-		Gui, Show, , Comando n„o definido
+		Gui, Show, , Comando n√£o definido
 	;
 	GuiControl, Focus, Button1
 	;
@@ -74,8 +74,8 @@ return
 	Querendo criar comando, abre-se uma nova tela, perguntando qual o
 	comando que deseja configurar.
 	
-	Pode configurar tanto um comando global (em casos de n„o existÍncia),
-	como comandos especÌficos (quando h· o primeiro, mas n„o h· o ˙ltimo).
+	Pode configurar tanto um comando global (em casos de n√£o exist√™ncia),
+	como comandos espec√≠ficos (quando h√° o primeiro, mas n√£o h√° o √∫ltimo).
 */
 CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 	static comando
@@ -96,8 +96,8 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 		commArr := StrSplit(A_LoopField, "=", , 2)
 		if (commArr[1] <> (acao . "*")){
 			if (!temComandoCadastrado){
-				Gui, Add, Text, , Copiar associaÁ„o de:
-				Gui, Add, ListView, gCopiaComando -WantF2 Grid w800 NoSortHdr Sort r10 x+m, AssociaÁ„o|Comando
+				Gui, Add, Text, , Copiar associa√ß√£o de:
+				Gui, Add, ListView, gCopiaComando -WantF2 Grid w800 NoSortHdr Sort r10 x+m, Associa√ß√£o|Comando
 				temComandoCadastrado := !temComandoCadastrado
 			}
 			LV_Add("", commArr[1], commArr[2])
@@ -112,8 +112,8 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 	if (!temComandoCadastrado)
 		GuiControl, Focus, Edit1
 	if (!temAcaoGlobal)
-		Gui, Add, CheckBox, xm, Comando global da aÁ„o %acao%
-	Gui, Add, Text, xm, Dica: a m·scara ### pode ser usada. Ela ser· substituÌda pelo caminho do arquivo/pasta.
+		Gui, Add, CheckBox, xm, Comando global da a√ß√£o %acao%
+	Gui, Add, Text, xm, Dica: a m√°scara ### pode ser usada. Ela ser√° substitu√≠da pelo caminho do arquivo/pasta.
 	;
 	Gui, Add, Button, Hidden Default gCopiaOuNovoComando, OK
 	Gui, Show, AutoSize , Cadastro de comando
@@ -190,7 +190,7 @@ EscreveNovoComandoNoIni(extensao, ByRef comando){
 
 ehValidoNovoComando(comandoDigitado){
 	if (Trim(comandoDigitado) == ""){
-		msgbox, 36, , Confirma a inclus„o de comando vazio?
+		msgbox, 36, , Confirma a inclus√£o de comando vazio?
 		IfMsgBox, Yes
 			return True
 		else

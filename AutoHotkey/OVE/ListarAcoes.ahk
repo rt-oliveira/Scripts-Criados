@@ -1,7 +1,7 @@
-; Caso 'acao' seja '-la', será aberta uma janela que lista as ações já cadastradas no
-; arquivo de configurações. O usuário poderá então escolher uma das ações mostradas
-; para usar no arquivo atual, ou então criar uma nova ação. 
-; Haverá a opção de poder usar esta mesma ação (escolhida/criada) para todos os próximos
+ï»¿; Caso 'acao' seja '-la', serÃ¡ aberta uma janela que lista as aÃ§Ãµes jÃ¡ cadastradas no
+; arquivo de configuraÃ§Ãµes. O usuÃ¡rio poderÃ¡ entÃ£o escolher uma das aÃ§Ãµes mostradas
+; para usar no arquivo atual, ou entÃ£o criar uma nova aÃ§Ã£o. 
+; HaverÃ¡ a opÃ§Ã£o de poder usar esta mesma aÃ§Ã£o (escolhida/criada) para todos os prÃ³ximos
 ; arquivos passados.
 ListarAcoes(arquivo){
   acaoEscolhida := ""
@@ -17,14 +17,14 @@ ListarAcoes(arquivo){
     Gui, Add, Text, , Pasta: %arquivo%
   else
     Gui, Add, Text, , Arquivo: %arquivo%
-  Gui, Add, Text, , Ações:
+  Gui, Add, Text, , AÃ§Ãµes:
   Gui, Add, ListBox, x+m R10 Sort w%tamanhoListBox% gCliqueAcao, %outSecoes%
-  Gui, Add, Button, xm R0.5 gNovaAcao, Nova Ação:
+  Gui, Add, Button, xm R0.5 gNovaAcao, Nova AÃ§Ã£o:
   Gui, Add, Edit, x+m
-  Gui, Add, Checkbox, xm vParaTodos, Válido para este e os próximos arquivos?
+  Gui, Add, Checkbox, xm vParaTodos, VÃ¡lido para este e os prÃ³ximos arquivos?
   Gui, -MaximizeBox AlwaysOnTop
   Gui, ListarAcoes:Add, Button, Hidden Default gAcaoListaAcoes, Ok
-  Gui, Show, AutoSize , Lista de ações
+  Gui, Show, AutoSize , Lista de aÃ§Ãµes
   ;
   Pause, On
   ;
@@ -67,9 +67,9 @@ AcaoListaAcoes:
   else if (outFoco == "Button2"){
     /*
       Caso esteja no checkbox, na ordem:
-        1. Vê se escolheu alguma ação no lista ações já cadastradas.
-        2. Caso não tenha nenhuma ação escolhida, vê se digitou alguma nova ação.
-        3. Em último caso, avisa para escolher alguma ação ou digitar uma nova ação.
+        1. VÃª se escolheu alguma aÃ§Ã£o no lista aÃ§Ãµes jÃ¡ cadastradas.
+        2. Caso nÃ£o tenha nenhuma aÃ§Ã£o escolhida, vÃª se digitou alguma nova aÃ§Ã£o.
+        3. Em Ãºltimo caso, avisa para escolher alguma aÃ§Ã£o ou digitar uma nova aÃ§Ã£o.
     */
     GuiControlGet, acaoEscolhida, , ListBox1
     if (Trim(acaoEscolhida) <> ""){
@@ -78,7 +78,7 @@ AcaoListaAcoes:
     } else {
       ControlGetText, acaoEscolhida, Edit1
       if (Trim(acaoEscolhida) == ""){
-        msgbox 262144, , Por favor, escolha uma ação da lista ou digite uma nova ação.
+        msgbox 262144, , Por favor, escolha uma aÃ§Ã£o da lista ou digite uma nova aÃ§Ã£o.
         ControlFocus, ListBox1
         return
       }
@@ -95,7 +95,8 @@ AcaoListaAcoes:
 CliqueAcao:
   if (A_GuiEvent == "DoubleClick"){
     GuiControlGet, acaoEscolhida, , ListBox1
-    Gui, Destroy
+	Gui, Submit
+	Gui, Destroy
     Pause, Off
   }
   return
@@ -104,17 +105,17 @@ CliqueAcao:
 ValidaNovaAcao(){
   ControlGetText, novaAcao, Edit1
   if (Trim(novaAcao) == ""){
-    MsgBox 262144, , Não há ação preenchida. Por favor, preencha a ação.
+    MsgBox 262144, , NÃ£o hÃ¡ aÃ§Ã£o preenchida. Por favor, preencha a aÃ§Ã£o.
     return False
   }
   if (!RegExMatch(novaAcao, "^[a-zA-Z0-9]+$")){
-    MsgBox 262144, , %NvAcao% é inválido. Ações só podem ter letras e números.
+    MsgBox 262144, , %NvAcao% Ã© invÃ¡lido. AÃ§Ãµes sÃ³ podem ter letras e nÃºmeros.
     return False
   }
   ;
   IniRead, secoes, %localIni%, %novaAcao%
   if (secoes <> ""){
-    MsgBox 262144, , %novaAcao% já existe.
+    MsgBox 262144, , %novaAcao% jÃ¡ existe.
     return False
   }
   return True
