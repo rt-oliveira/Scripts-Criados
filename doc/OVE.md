@@ -44,6 +44,18 @@ Onde "acao" pode ser: "open", "view" ou "edit".
 
 O script sempre requerirá 1 ação e, pelo menos, 1 arquivo, para o seu funcionamento.
 
+**Novidade na versão 2.3.0 do OVE em AutoHotkey**: agora será permitido poder executar comandos de ações já existentes com parâmetros.
+
+Para tal, *ação* deve conter um sufixo **-p**. Com isso, pode ser passado para o script, além da ação:
+    - 1 único arquivo (**obrigatório**), e;
+    - Argumentos, que serão aplicados sobre este arquivo (**opcional**).
+Com isso, o programa é usado da seguinte forma:
+
+```ahk
+O programa deve ser usado da seguinte forma:
+OVE acao-p arquivo [argumento1 argumento2 ...]
+```
+
 ## Restrições
 
 1. Esse script foi planejado para ser executado no Double Commander, porém ele pode ser adaptado para ser usado junto com outros programas (geralmente exploradores de arquivos).
