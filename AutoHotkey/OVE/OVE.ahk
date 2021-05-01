@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.2.3.0
+;@Ahk2Exe-SetVersion 2.3.0.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -16,7 +16,7 @@ DetectHiddenText, on
 Testar()
 
 ; Três variáveis globais
-global acao, localIni, ParaTodos
+global acao, localIni, ParaTodos, i
 ParaTodos := True
 global tamanhoFonte := 16
 ;
@@ -28,26 +28,39 @@ if (!FileExist(localIni))
 ;
 ConfigurarVariaveisAmbiente()
 ;
-for i, arquivo in A_Args
-{
-	if (i == 1)
-		continue
-	else{
+if (SubStr(acao, -1) == "-p")
+	i := 3
+else
+	i := 2
+;
+while (i <= A_Args.Length()){
+	arquivo	:= A_Args[i]
+	;
+	if (SubStr(acao, -1) == "-p"){
+		if InStr(arquivo, " ")
+			argumentos	.= """" . arquivo . """ "
+		else
+			argumentos	.= arquivo . " "
+	} else {
 		if (acao == "-la")
-          acao := ListarAcoes(arquivo)
+			acao := ListarAcoes(arquivo)
 		;
 		if (SubStr(arquivo, -3) == ".lnk") {
-          ; Em casos de atalhos do Windows, eu "abro" ele, para recuperar 
-          ; o destino dele e os seus argumentos.
-          FileGetShortcut, %arquivo%, destino, , argumentos
-          RecuperarEExecutarComando(acao, destino, argumentos)
-        } else
-          RecuperarEExecutarComando(acao, arquivo)
+			; Em casos de atalhos do Windows, eu "abro" ele, para recuperar 
+			; o destino dele e os seus argumentos.
+			FileGetShortcut, %arquivo%, destino, , argumentos
+			RecuperarEExecutarComando(acao, destino, argumentos)
+		} else
+			RecuperarEExecutarComando(acao, arquivo)
 		;
 		if (!ParaTodos)
 			acao := "-la"
 	}
+	;
+	i++
 }
+if (SubStr(acao, -1) == "-p")
+	RecuperarEExecutarComando(SubStr(acao, 1, -2), A_Args[2], argumentos)
 exitapp
 	
 ;----------------------------------------------------------------
@@ -119,7 +132,7 @@ RecuperarExtensao(arquivo){
      de criar um comando específico para aquela extensão (mas que pode vir a ser global da ação).
 */
 RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
-    extensao := RecuperarExtensao(arquivo)
+  extensao := RecuperarExtensao(arquivo)
 	;
 	IniRead, comandoRecuperado, %localIni%, %acao%, %acao%%extensao%
 	comandoRecuperado = %comandoRecuperado% ; Para remover espaços em branco no início e no fim da string
@@ -176,12 +189,17 @@ ConfigurarVariaveisAmbiente(){
 }
 
 ; Para o programa funcionar, é preciso passar:
-; - Um comando, que pode ser:
-;   - Uma ação (composta por letras e números), ou;
-;   - -la, que é um argumento especial, que listará todos os comandos configurados.
+; - Um ação, que pode ser:
+;   - Uma combinação de letras e números, ou;
+;   - -la, que é uma ação especial, que listará todos as ações já configuradas.
 ; - E uma lista de arquivos (com pelo menos 1 arquivo).
+; Porém, a ação pode ter também o sufixo '-p'. Com ele, é passado:
+;		- Somente 1 arquivo;
+;		- Argumentos, que serão aplicados sobre este arquivo.
+;		Neste modo, será executado o comando associado a ação (que é de mesmo nome, sem
+;		os 2 últimos caracteres), embutindo tais parâmetros nesse comando
 Testar(){
-  if ((A_Args.Length() < 2) or !(A_Args[1] ~= "^([a-zA-Z0-9]+)|(-la)$"))
+  if ((A_Args.Length() < 2) or !(A_Args[1] ~= "^[a-zA-Z0-9]+(-p|$)|^-la$"))
     ErroOVE()
   else
     acao := A_Args[1]
@@ -200,7 +218,15 @@ OVE acao programa1 [programa2 programa3 ...]
 Onde 'acao' pode ser:
 - Um termo que contenha somente letras (sem acentos) e números, ou;
 - '-la', que vai listar as ações.
-  )
+
+Porém, 'acao' pode ter também o sufixo '-p'. Com ele, é passado:
+- Somente 1 arquivo;
+- Uma lista de argumentos, que serão aplicados sobre este arquivo.
+Com isso, o programa é usado da seguinte forma:
+
+O programa deve ser usado da seguinte forma:
+OVE acao-p arquivo [argumento1 argumento2 ...]
+)
 	MsgBox, 16, OVE, %msg%
 	exitapp
 }
