@@ -1,7 +1,6 @@
 ﻿/*
-	Nos casos em não há comando específico configuração para a combinação (ação+extensão),
-	será mostrada uma tela, que será perguntado se deseja criar um comando, que pode ser
-	específico, ou até mesmo global.
+	Nos casos em não há comando específico configuração para a extensão, será mostrada uma tela,
+	que será perguntado se deseja criar um comando, que pode ser específico, ou até mesmo global.
 */
 VaiCadastrarAcao(arquivo, extensao, temAcaoGlobal := False){
 	global tamanhoFonte
@@ -28,10 +27,12 @@ Deseja cadastrar um comando específico para esta extensão?
 Deseja definir agora?
 		)
 	}
-	Gui, Add, Button, w500 Default gCadastrarAcao, Sim
-	Gui, Add, Button, w500 gNaoCadastrarAcao, Não
-	if (temAcaoGlobal)
-		Gui, Add, Button, w500 gNaoCadastrarNaoPerguntar, Não, e não pergunte novamente
+	Gui, Add, Button, w650 Default gCadastrarAcao, Sim
+	Gui, Add, Button, w650 gNaoCadastrarAcao, Não
+	if (temAcaoGlobal){
+		Gui, Add, Button, w650 gNaoCadastrarNaoPerguntar, Não, e não pergunte novamente (para a ação %acao%)
+		Gui, Add, Button, w650 gNaoCadastrarNaoPerguntarExt, Não, e não pergunte novamente (para a extensão %extensao%)
+	}
 	Gui, -MaximizeBox AlwaysOnTop
 	if (temAcaoGlobal)
 		Gui, Show, , Comando específico não definido
@@ -63,7 +64,14 @@ Pause, Off
 return
 
 NaoCadastrarNaoPerguntar:
-IniWrite, N, %localIni%, %acao%, permissaoCadComandoEspec
+IniWrite, N, %localIni%, %acao%, permissaoCadComandoEspec*
+vaiCriarAcao := "N"
+Gui, Destroy
+Pause, Off
+return
+
+NaoCadastrarNaoPerguntarExt:
+IniWrite, N, %localIni%, %acao%, permissaoCadComandoEspec%extensao%
 vaiCriarAcao := "N"
 Gui, Destroy
 Pause, Off
@@ -161,10 +169,7 @@ EscreveCopiaNoIni(extensao, ByRef comando){
 		LV_GetText(comando,LV_GetNext(),2)
 		ControlGet, ehComandoGlobal, Checked, , Button2
 		;
-		if (ehComandoGlobal)
-			IniWrite, %comando%, %localIni%, %acao%, %acao%*
-		else
-			IniWrite, %comando%, %localIni%, %acao%, %acao%%extensao%
+		EscreverComando(ehComandoGlobal, comando, extensao)
 		;
 		Gui, Destroy
 		Pause, Off
@@ -178,10 +183,7 @@ EscreveNovoComandoNoIni(extensao, ByRef comando){
 		comando := comandoDigitado
 		ControlGet, ehComandoGlobal, Checked, , Button2
 		;
-		if (ehComandoGlobal)
-			IniWrite, %comandoDigitado%, %localIni%, %acao%, %acao%*
-		else
-			IniWrite, %comandoDigitado%, %localIni%, %acao%, %acao%%extensao%
+		EscreverComando(ehComandoGlobal, comandoDigitado, extensao)
 		;
 		Gui, Destroy
 		Pause, Off
@@ -203,4 +205,11 @@ ehValidoNovoComando(comandoDigitado){
 	}
 	;
 	return True
+}
+
+EscreverComando(ehComandoGlobal, comando, extensao){
+	if (ehComandoGlobal)
+		IniWrite, %comando%, %localIni%, %acao%, *
+	else
+		IniWrite, %comando%, %localIni%, %acao%, %extensao%
 }

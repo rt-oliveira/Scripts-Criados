@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.3.0.0
+;@Ahk2Exe-SetVersion 2.4.0.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -123,45 +123,48 @@ RecuperarExtensao(arquivo){
      um comando global para aquela ação.
     - Havendo, será aberta a possibilidade de poder configurar um comando específico daquela
       ação para aquela extensão
-      - Caso seja permitido perguntar, pois é possível desabilitar tal opção, fazendo com que
-        sempre force a executar o comando global para todas as extensões não configuradas naquela
-        ação.
-      - Caso configure um comando específico, este será rodado. Caso contrário, será rodado o comando
-        global.
+      - Porém, eu só vou poder perguntar caso haja permissão para perguntar.
+        - É possível desabilitar individualmente (só para aquela extensão).
+          - Força esta extensão a rodar sempre o comando global.
+        - É possível desabilitar globalmente (para todas as extensões).
+          - Todas as extensões sem comando específico vão rodar este comando global.
+    - Caso configure um comando específico, este será rodado. Caso contrário, será rodado o comando
+      global.
   3. Em casos em que não há nem um comando específico, nem um comando global, será dada a possibilidade
      de criar um comando específico para aquela extensão (mas que pode vir a ser global da ação).
 */
 RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
   extensao := RecuperarExtensao(arquivo)
 	;
-	IniRead, comandoRecuperado, %localIni%, %acao%, %acao%%extensao%
+	IniRead, comandoRecuperado, %localIni%, %acao%, %extensao%
 	comandoRecuperado = %comandoRecuperado% ; Para remover espaços em branco no início e no fim da string
 	if (comandoRecuperado <> "ERROR"){
-      ExecutarComando(comandoRecuperado, arquivo, argumentos)
-      return
-    }
+    ExecutarComando(comandoRecuperado, arquivo, argumentos)
+    return
+  }
+  ;
+  IniRead, comandoRecuperado, %localIni%, %acao%, *
+  comandoRecuperado = %comandoRecuperado%
+  if (comandoRecuperado <> "ERROR"){
     ;
-    IniRead, comandoRecuperado, %localIni%, %acao%, %acao%*
-    comandoRecuperado = %comandoRecuperado%
-    if (comandoRecuperado <> "ERROR"){
-      ;
-      IniRead, permissaoCadComandoEspec, %localIni%, %acao%, permissaoCadComandoEspec, S
-      if (permissaoCadComandoEspec == "S"){
-        if (VaiCadastrarAcao(arquivo, extensao, True) == "S"){
-          comandoCriado := CriarComandoAcao(arquivo, extensao, True)
-          comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
-        }
-      }
-    } else {
-      ;
-      comandoRecuperado := ""
-      if (VaiCadastrarAcao(arquivo, extensao, False) == "S"){
-        comandoCriado := CriarComandoAcao(arquivo, extensao, False)
+    IniRead, permissaoCadComandoEspecGlobal, %localIni%, %acao%, permissaoCadComandoEspec*, S
+    IniRead, permissaoCadComandoEspecExtens, %localIni%, %acao%, permissaoCadComandoEspec%extensao%, S
+    if (permissaoCadComandoEspecGlobal == "S" or permissaoCadComandoEspecExtens == "S"){
+      if (VaiCadastrarAcao(arquivo, extensao, True) == "S"){
+        comandoCriado := CriarComandoAcao(arquivo, extensao, True)
         comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
       }
     }
+  } else {
     ;
-    ExecutarComando(comandoRecuperado, arquivo, argumentos)
+    comandoRecuperado := ""
+    if (VaiCadastrarAcao(arquivo, extensao, False) == "S"){
+      comandoCriado := CriarComandoAcao(arquivo, extensao, False)
+      comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
+    }
+  }
+  ;
+  ExecutarComando(comandoRecuperado, arquivo, argumentos)
 }
 
 ; Esta função foi criada para permitir a execução de programas sem precisar, muitas vezes,
