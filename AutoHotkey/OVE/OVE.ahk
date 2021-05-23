@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.4.0.0
+;@Ahk2Exe-SetVersion 2.4.1.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -149,7 +149,7 @@ RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
     ;
     IniRead, permissaoCadComandoEspecGlobal, %localIni%, %acao%, permissaoCadComandoEspec*, S
     IniRead, permissaoCadComandoEspecExtens, %localIni%, %acao%, permissaoCadComandoEspec%extensao%, S
-    if (permissaoCadComandoEspecGlobal == "S" or permissaoCadComandoEspecExtens == "S"){
+    if (permissaoCadComandoEspecGlobal == "S" and permissaoCadComandoEspecExtens == "S"){
       if (VaiCadastrarAcao(arquivo, extensao, True) == "S"){
         comandoCriado := CriarComandoAcao(arquivo, extensao, True)
         comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
