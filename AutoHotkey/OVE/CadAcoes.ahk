@@ -208,6 +208,9 @@ ehValidoNovoComando(comandoDigitado){
 }
 
 EscreverComando(ehComandoGlobal, comando, extensao){
+	if RegExMatch(comando, """.*""")
+		comando := """" . comando . """"
+	;
 	if (ehComandoGlobal)
 		IniWrite, %comando%, %localIni%, %acao%, *
 	else
