@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.4.2.0
+;@Ahk2Exe-SetVersion 2.4.3.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -76,7 +76,10 @@ ExecutarComando(comando, arquivo, argumentos := ""){
   ;
   try
   {
-    SplitPath, arquivo, , diretorioTrabalho
+    if (FileExist(arquivo) != "D")
+      SplitPath, arquivo, , diretorioTrabalho
+    else
+      diretorioTrabalho := arquivo
     Run, %comando%, %diretorioTrabalho%, , outPID
   }
   catch
