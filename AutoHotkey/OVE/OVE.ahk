@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.4.3.0
+;@Ahk2Exe-SetVersion 2.4.4.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -35,6 +35,9 @@ else
 ;
 while (i <= A_Args.Length()){
 	arquivo	:= A_Args[i]
+	; Para corrigir um comportamento do AHK, que tem a ver com raízes de partições como argumentos
+	if (SubStr(arquivo, 0) == """")
+		arquivo := SubStr(arquivo, 1, -1)
 	;
 	if (SubStr(acao, -1) == "-p"){
 		if InStr(arquivo, " ")
@@ -76,10 +79,10 @@ ExecutarComando(comando, arquivo, argumentos := ""){
   ;
   try
   {
-    if (FileExist(arquivo) != "D")
-      SplitPath, arquivo, , diretorioTrabalho
+    if (FileExist(arquivo) ~= "D")
+		diretorioTrabalho := arquivo
     else
-      diretorioTrabalho := arquivo
+		SplitPath, arquivo, , diretorioTrabalho
     Run, %comando%, %diretorioTrabalho%, , outPID
   }
   catch
@@ -102,7 +105,9 @@ Comando: %comando%
 ;   - Caso o arquivo tenha extensão, simplesmente o retorna;
 ;   - Caso o arquivo não tenha, usa-se uma máscara padrão do tipo "\<nome do arquivo>"
 RecuperarExtensao(arquivo){
-	if (FileExist(arquivo) == "D")
+	; Uma pasta não necessariamente terá só o atributo de pasta,
+	; pode ter outros, e nesses casos o programa não identificaria como pasta.
+	if (FileExist(arquivo) ~= "D")
 		return "Pastas"
 	else{
 		SplitPath, arquivo, nomeArquivo, , tmpExt

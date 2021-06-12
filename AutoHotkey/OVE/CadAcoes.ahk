@@ -92,7 +92,7 @@ CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
 	Gui, CadAcoes:Default
 	;
 	Gui, Font, s%tamanhoFonte%, MS Sans Serif
-	if (FileExist(arquivo) == "D")
+	if (FileExist(arquivo) ~= "D")
 		Gui, Add, Text, , Pasta: %arquivo%
 	else
 		Gui, Add, Text, , Arquivo: %arquivo%

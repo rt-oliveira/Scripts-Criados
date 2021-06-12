@@ -13,7 +13,7 @@ ListarAcoes(arquivo){
   ;
   Gui, ListarAcoes:Default
   Gui, Font, s%tamanhoFonte%, MS Sans Serif
-  if (FileExist(arquivo) == "D")
+  if (FileExist(arquivo) ~= "D")
     Gui, Add, Text, , Pasta: %arquivo%
   else
     Gui, Add, Text, , Arquivo: %arquivo%
