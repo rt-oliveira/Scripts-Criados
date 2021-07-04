@@ -10,8 +10,6 @@ Ele foi criado para, inicialmente, poder me facilitar, pois como sou um usuário
 
 Esse script, junto com um outro, chamado de "Alias", que possui as associações criadas, permite que possam ser rodadas associações customizadas de programa padrão com as extensões, sem precisar configurá-las no sistema operacional.
 
-Podem ser configuradas associações em ações diferentes: abrir (*open*), ver (*view*) e editar (*edit*).
-
 ## Motivação
 
 Normalmente, para fazer com que um determinado arquivo, de uma determinada extensão, rode em um programa específico, é preciso ir nas configurações de `Programas Padrão` do sistema operacional, escolher a extensão e o programa padrão desta extensão.
@@ -36,13 +34,21 @@ No início da execução do script *controller*, o script de alias é chamado, d
 
 O script principal pode ser executado da seguinte forma:
 
-```batch
-OVE.bat acao arquivo1 [arquivo2 arquivo3 ...]
+```ahk
+OVE acao arquivo1 [arquivo2 arquivo3 ...]
 
-Onde "acao" pode ser: "open", "view" ou "edit".
+Onde "acao" é uma sequência de letras (sem acentos) e números.
 ```
 
 O script sempre requerirá 1 ação e, pelo menos, 1 arquivo, para o seu funcionamento.
+
+**Novidade na versão 2.0.0 do OVE em AutoHotkey**: agora será permitido passar um parâmetro que permite escolher na hora qual ação deseja. Este mesmo modo permite criar novas ações na hora também.
+
+Para tal, o parâmetro de ação deve ser *-la*. Com isso, o programa é usado da seguinte forma:
+
+~~~ahk
+OVE -la arquivo1 [arquivo2 arquivo3 ...]
+~~~
 
 **Novidade na versão 2.3.0 do OVE em AutoHotkey**: agora será permitido poder executar comandos de ações já existentes com parâmetros.
 
@@ -56,12 +62,26 @@ O programa deve ser usado da seguinte forma:
 OVE acao-p arquivo [argumento1 argumento2 ...]
 ```
 
+**Novo na versão 2.5.0 do OVE em AutoHotkey**: modo mais poderoso de execução de ações já existentes com parâmetros.
+
+Para tal, o programa ser usado da seguinte forma:
+
+~~~ahk
+OVE combinacao argumento1 [argumento2 argumento3 ...]
+~~~
+- Onde *combinacao* é: *acao*+*extensao*
+    - *extensao* pode ser:
+        - A extensão normal de um arquivo (incluindo o ponto '.');
+        - `\nomeArquivo`, caso o arquivo não tenha uma extensão, ou;
+        - `:Pastas`, para se referir as pastas e diretórios em geral.
+
 ## Restrições
 
 1. Esse script foi planejado para ser executado no Double Commander, porém ele pode ser adaptado para ser usado junto com outros programas (geralmente exploradores de arquivos).
     - Foi planejado para este programa, pois o mesmo permite que se possa configurar ações customizadas para as extensões, até mesmo sobreescrita de ações padrão para as mesmas extensões.
-2. Todos os arquivos passados vão estar sempre baseados na mesma ação, isto é, ao passar uma ação, dentre as 3 possíveis, e uma lista de arquivos, todas os arquivos vão ser tratados na mesma ação passada.
+2. Todos os arquivos passados vão estar sempre baseados na mesma ação, isto é, ao passar uma ação, e uma lista de arquivos, todas os arquivos vão ser tratados na mesma ação passada.
     - Exemplo: uma lista de arquivos e a ação "view", todos os arquivos serão tratados na ação de visualizá-los.
+    - Isto não se aplica quando se usa o parâmetro `-la`. Neste modo, será possível usar uma ação diferente para cada arquivo.
 
 ## Como implantar o script para seu uso?
 

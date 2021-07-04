@@ -2,7 +2,7 @@
 	Nos casos em não há comando específico configuração para a extensão, será mostrada uma tela,
 	que será perguntado se deseja criar um comando, que pode ser específico, ou até mesmo global.
 */
-VaiCadastrarAcao(arquivo, extensao, temAcaoGlobal := False){
+VaiCadastrarAcao(arquivo, extensao, acao, temAcaoGlobal := False){
 	global tamanhoFonte
 	;
 	Gui, PerguntaAcaoNaoDefinida:Default
@@ -85,7 +85,7 @@ return
 	Pode configurar tanto um comando global (em casos de não existência),
 	como comandos específicos (quando há o primeiro, mas não há o último).
 */
-CriarComandoAcao(arquivo, extensao, temAcaoGlobal){
+CriarComandoAcao(arquivo, extensao, temAcaoGlobal, acao){
 	static comando
 	comando := "ERROR"
 	;
@@ -138,52 +138,52 @@ CadAcoesGuiEscape:
 	
 CopiaComando:
 	if (A_GuiEvent == "DoubleClick")
-		EscreveCopiaNoIni(extensao, comando)
+		EscreveCopiaNoIni(extensao, comando, acao)
 	return	
 
 CopiaOuNovoComando:
 	Gui, Submit, NoHide
 	ControlGetFocus, controlComFoco
 	if (controlComFoco == "SysListView321")
-		EscreveCopiaNoIni(extensao, comando)
+		EscreveCopiaNoIni(extensao, comando, acao)
 	else if (controlComFoco == "Edit1"){
-		EscreveNovoComandoNoIni(extensao, comando)
+		EscreveNovoComandoNoIni(extensao, comando, acao)
 	}
 	else if (controlComFoco == "Button2"){
 		linhaSelecionada := LV_GetNext()
 		if (linhaSelecionada <> 0)
-			EscreveCopiaNoIni(extensao, comando)
+			EscreveCopiaNoIni(extensao, comando, acao)
 		else
-			EscreveNovoComandoNoIni(extensao, comando)
+			EscreveNovoComandoNoIni(extensao, comando, acao)
 	}
 	return
 
 NovoComando:
-	EscreveNovoComandoNoIni(extensao, comando)
+	EscreveNovoComandoNoIni(extensao, comando, acao)
 	return
 }
 
-EscreveCopiaNoIni(extensao, ByRef comando){
+EscreveCopiaNoIni(extensao, ByRef comando, acao){
 	linhaSelecionada := LV_GetNext()
 	if (linhaSelecionada <> 0){
 		LV_GetText(comando,LV_GetNext(),2)
 		ControlGet, ehComandoGlobal, Checked, , Button2
 		;
-		EscreverComando(ehComandoGlobal, comando, extensao)
+		EscreverComando(ehComandoGlobal, comando, extensao, acao)
 		;
 		Gui, Destroy
 		Pause, Off
 	}
 }
 
-EscreveNovoComandoNoIni(extensao, ByRef comando){
+EscreveNovoComandoNoIni(extensao, ByRef comando, acao){
 	ControlGetText, comandoDigitado, Edit1
 	;
 	if (ehValidoNovoComando(comandoDigitado)){
 		comando := comandoDigitado
 		ControlGet, ehComandoGlobal, Checked, , Button2
 		;
-		EscreverComando(ehComandoGlobal, comandoDigitado, extensao)
+		EscreverComando(ehComandoGlobal, comandoDigitado, extensao, acao)
 		;
 		Gui, Destroy
 		Pause, Off
@@ -207,8 +207,8 @@ ehValidoNovoComando(comandoDigitado){
 	return True
 }
 
-EscreverComando(ehComandoGlobal, comando, extensao){
-	if RegExMatch(comando, """.*""")
+EscreverComando(ehComandoGlobal, comando, extensao, acao){
+	if RegExMatch(comando, "^"".*""$")
 		comando := """" . comando . """"
 	;
 	if (ehComandoGlobal)

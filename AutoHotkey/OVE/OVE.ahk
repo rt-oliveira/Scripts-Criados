@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 2.4.4.0
+;@Ahk2Exe-SetVersion 2.5.0.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -29,23 +29,67 @@ if (!FileExist(localIni))
 ConfigurarVariaveisAmbiente()
 ;
 if (SubStr(acao, -1) == "-p")
-	i := 3
+  OVEComParametros()
+else if (RegExMatch(acao, ":Pastas|\..*|\\.*"))
+  OVEAcaoEExtensaoDefinida()
 else
-	i := 2
+  OVENormal()
 ;
-while (i <= A_Args.Length()){
-	arquivo	:= A_Args[i]
-	; Para corrigir um comportamento do AHK, que tem a ver com raízes de partições como argumentos
-	if (SubStr(arquivo, 0) == """")
-		arquivo := SubStr(arquivo, 1, -1)
-	;
-	if (SubStr(acao, -1) == "-p"){
-		if InStr(arquivo, " ")
+exitapp
+	
+;----------------------------------------------------------------
+OVEComParametros(){
+  global arquivo, argumentos, acao
+  i := 3
+  ;
+  while (i <= A_Args.Length()){
+    arquivo := SanitizarArgumento(A_Args[i])
+    ;
+    if InStr(arquivo, " ")
 			argumentos	.= """" . arquivo . """ "
 		else
 			argumentos	.= arquivo . " "
-	} else {
-		if (acao == "-la")
+    ;
+    i++
+  }
+  RecuperarEExecutarComando(SubStr(acao, 1, -2), A_Args[2], argumentos)
+  ExitApp
+}
+
+/*  Novidade na versão 2.5.0.0 do OVE:
+  Executar um comando específico já definido, sem precisar identificar a extensão do arquivo em questão.
+  Na ação põe como sufixo a extensão que deseja executar o comando.
+
+  A partir daí neste modo tudo que for passado será entendido como argumento para o comando já configurado.
+*/
+OVEAcaoEExtensaoDefinida(){
+  global arquivo, argumentos, acao
+  acaoSemExtensao := SubStr(acao, 1, RegExMatch(acao, ":Pastas|\..*|\\.*")-1)
+  extensao  := SubStr(acao, RegExMatch(acao, ":Pastas|\..*|\\.*"))
+  i := 2
+  ;
+  while (i <= A_Args.Length()){
+    arquivo := SanitizarArgumento(A_Args[i])
+    ;
+    if InStr(arquivo, " ")
+			argumentos	.= """" . arquivo . """ "
+		else
+			argumentos	.= arquivo . " "
+    ;
+    i++
+  }
+  ;
+  RecuperarEExecutarComandoExtensaoDefinida(acaoSemExtensao, argumentos, extensao)
+}
+
+OVENormal(){
+  global arquivo, argumentos, acao
+  i := 2
+  ;
+  while (i <= A_Args.Length()){
+    arquivo := SanitizarArgumento(A_Args[i])
+    ;
+    if (acao == "-la")
 			acao := ListarAcoes(arquivo)
 		;
 		if (SubStr(arquivo, -3) == ".lnk") {
@@ -58,15 +102,17 @@ while (i <= A_Args.Length()){
 		;
 		if (!ParaTodos)
 			acao := "-la"
-	}
-	;
-	i++
+    ;
+    i++
+  }
 }
-if (SubStr(acao, -1) == "-p")
-	RecuperarEExecutarComando(SubStr(acao, 1, -2), A_Args[2], argumentos)
-exitapp
-	
-;----------------------------------------------------------------
+
+SanitizarArgumento(argumento){
+  if (SubStr(argumento, 0) == """")
+		return SubStr(argumento, 1, -1)
+  else
+    return argumento
+}
 
 ; Esta é a função que efetivamente executará os comandos vindos das associações.
 ExecutarComando(comando, arquivo, argumentos := ""){
@@ -80,10 +126,34 @@ ExecutarComando(comando, arquivo, argumentos := ""){
   try
   {
     if (FileExist(arquivo) ~= "D")
-		diretorioTrabalho := arquivo
+		  diretorioTrabalho := arquivo
     else
-		SplitPath, arquivo, , diretorioTrabalho
+		  SplitPath, arquivo, , diretorioTrabalho
     Run, %comando%, %diretorioTrabalho%, , outPID
+  }
+  catch
+  {
+    WinKill, ahk_pid %outPID%
+    msgbox, 
+    (
+    Erro ao executar csomando.
+          
+Verifique o comando executado.
+Comando: %comando%
+    )
+    exitapp
+  }
+}
+
+ExecutarComandoSoComArgumento(comando, argumentos){
+  if (trim(comando) == "")
+    return
+  ;
+  comando := StrReplace(comando, "###", argumentos)
+  ;
+  try
+  {
+    Run, %comando%, , , outPID
   }
   catch
   {
@@ -108,7 +178,7 @@ RecuperarExtensao(arquivo){
 	; Uma pasta não necessariamente terá só o atributo de pasta,
 	; pode ter outros, e nesses casos o programa não identificaria como pasta.
 	if (FileExist(arquivo) ~= "D")
-		return "Pastas"
+		return ":Pastas"
 	else{
 		SplitPath, arquivo, nomeArquivo, , tmpExt
 		StringLower, tmpExt, tmpExt
@@ -159,21 +229,37 @@ RecuperarEExecutarComando(acao, arquivo, argumentos := ""){
     IniRead, permissaoCadComandoEspecGlobal, %localIni%, %acao%, permissaoCadComandoEspec*, S
     IniRead, permissaoCadComandoEspecExtens, %localIni%, %acao%, permissaoCadComandoEspec%extensao%, S
     if (permissaoCadComandoEspecGlobal == "S" and permissaoCadComandoEspecExtens == "S"){
-      if (VaiCadastrarAcao(arquivo, extensao, True) == "S"){
-        comandoCriado := CriarComandoAcao(arquivo, extensao, True)
+      if (VaiCadastrarAcao(arquivo, extensao, acao, True) == "S"){
+        comandoCriado := CriarComandoAcao(arquivo, extensao, True, acao)
         comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
       }
     }
   } else {
     ;
     comandoRecuperado := ""
-    if (VaiCadastrarAcao(arquivo, extensao, False) == "S"){
-      comandoCriado := CriarComandoAcao(arquivo, extensao, False)
+    if (VaiCadastrarAcao(arquivo, extensao, acao, False) == "S"){
+      comandoCriado := CriarComandoAcao(arquivo, extensao, False, acao)
       comandoRecuperado := (comandoCriado == "ERROR") ? comandoRecuperado : comandoCriado
     }
   }
   ;
   ExecutarComando(comandoRecuperado, arquivo, argumentos)
+}
+
+/*  No novo modo criado na versão 2.5.0.0 do OVE será preciso já existir um comando específico
+  para a combinação (ação+extensão).
+
+  Caso não exista, deve-se configurar previamente.
+*/
+RecuperarEExecutarComandoExtensaoDefinida(acao, argumentos, extensao){
+  IniRead, comandoRecuperado, %localIni%, %acao%, %extensao%
+	comandoRecuperado = %comandoRecuperado% ; Para remover espaços em branco no início e no fim da string
+	if (comandoRecuperado <> "ERROR"){
+    ExecutarComandoSoComArgumento(comandoRecuperado, argumentos)
+  } else {
+    MsgBox 0x10, Erro, Não existe comando específico cadastrado para a combinação %acao%%extensao%.
+    ExitApp
+  }
 }
 
 ; Esta função foi criada para permitir a execução de programas sem precisar, muitas vezes,
@@ -211,13 +297,13 @@ ConfigurarVariaveisAmbiente(){
 ;		Neste modo, será executado o comando associado a ação (que é de mesmo nome, sem
 ;		os 2 últimos caracteres), embutindo tais parâmetros nesse comando
 Testar(){
-  if ((A_Args.Length() < 2) or !(A_Args[1] ~= "^[a-zA-Z0-9]+(-p|$)|^-la$"))
+  if ((A_Args.Length() < 2) or !(A_Args[1] ~= "^[a-zA-Z0-9]+(-p|:Pastas|\\.*|\..*|$)|^-la$"))
     ErroOVE()
   else
     acao := A_Args[1]
 }
 
-; Mensagem de erro, informando que deve ser passado, pelo menos, 1 ação e 1 arquivo,
+; Mensagem de erro, informando que deve ser passado, pelo menos, 1 parâmetro de ação e 1 parâmetro de arquivo/argumento,
 ; para o script ser executado.
 ErroOVE(){
 	msg = 
@@ -225,19 +311,27 @@ ErroOVE(){
     Não foi passada ação ou arquivo para o programa.
 
 O programa deve ser usado da seguinte forma:
-OVE acao programa1 [programa2 programa3 ...]
+1) OVE acao arquivo1 [arquivo2 arquivo3 ...]
+OU
+2) OVE -la arquivo1 [arquivo2 arquivo3 ...]
+OU
+3) OVE acao-p arquivo [argumento1 argumento2 argumento3 ...]
+OU
+4) OVE combinacao argumento1 [argumento2 argumento3 ...]
 
-Onde 'acao' pode ser:
-- Um termo que contenha somente letras (sem acentos) e números, ou;
-- '-la', que vai listar as ações.
+Explicação dos modos:
+1) Modo normal, onde todos os arquivos passados serão executados sob a ação 'acao';
+2) Modo em que é possível escolher ou criar uma nova ação, e ela será usada nos arquivos passados;
+3) Modo especial, que permite anexar argumentos ao final do comando configurado para a extensão na ação;
+4) Modo mais poderoso que o 3), pois permite anexar argumentos em qualquer ordem, pois o comando que será executado está definido em 'combinacao'.
 
-Porém, 'acao' pode ter também o sufixo '-p'. Com ele, é passado:
-- Somente 1 arquivo;
-- Uma lista de argumentos, que serão aplicados sobre este arquivo.
-Com isso, o programa é usado da seguinte forma:
-
-O programa deve ser usado da seguinte forma:
-OVE acao-p arquivo [argumento1 argumento2 ...]
+Observações:
+- 'acao' é um termo que contém somente letras (sem acentos) e números.
+- 'combinacao' é definido como: acao+extensao
+  - Onde 'extensao' pode ser:
+    - A extensão normal de um arquivo (incluindo o ponto '.');
+    - `\nomeArquivo`, caso o arquivo não tenha uma extensão, ou;
+    - `:Pastas`, para se referir as pastas e diretórios em geral.
 )
 	MsgBox, 16, OVE, %msg%
 	exitapp
