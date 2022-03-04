@@ -1,0 +1,3 @@
+[submodule "AutoHotkey/Lib/CGUI"]
+	path = AutoHotkey/Lib/CGUI
+	url = https://github.com/ChrisS85/CGUI.git
