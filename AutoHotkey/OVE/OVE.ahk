@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 3.0.0.0
+;@Ahk2Exe-SetVersion 3.0.1.0
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -28,7 +28,7 @@ class OVE {
 	static acao			:=	""
 	static tamanhoFonte	:=	16
 	static paraTodos	:=	True
-	static localIni		:=	ConcatenarCaminho(A_ScriptDir, "Config OVE.ini")
+	static localIni		:=	ConcatenarCaminho(True, A_ScriptDir, "Config OVE.ini")
 	static arquivoAtual	:=	""
 	static objIniReader	:=	""
 
@@ -352,8 +352,9 @@ Comando: %comando%
 	; Na primeira execução do programa, o arquivo de configuração não existirá.
 	; Com isso, ele será criado neste momento.
 	CriarArquivoConfiguracao(){
-		if (!FileExist(OVE.localIni))
+		if (!FileExist(OVE.localIni)){
 			FileAppend, , % OVE.localIni, UTF-8-RAW
+		}
 	}
 
 	; Mensagem de erro, informando que deve ser passado, pelo menos, 1 parâmetro de ação e 1 parâmetro de arquivo/argumento,
