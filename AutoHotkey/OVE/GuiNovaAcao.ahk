@@ -33,17 +33,15 @@ class GuiNovaAcao extends CGUI {
 		else
 			this.AddControl("Text", "lblPastaArquivo", "", "Arquivo: " . arquivo)
 		;
-		comandosSecao			:=	OVE.objIniReader.RecuperarSecao(acao)
-		Loop, Parse, comandosSecao, `n
+		for chave, valor in OVE.objIniReader.RecuperarSecao(acao)
 		{
-			commArr		:=	StrSplit(A_LoopField, "=", , 2)
-			if (commArr[1] ~= "^(\.|\*|\\|\:)"){
+			if (chave ~= "^(\.|\*|\\|\:)"){
 				if (!temComandos){
 					this.AddControl("Text", "lblCopiar", "", "Copiar associação de:")
 					this.lstOpcoes		:=	this.AddControl("ListView", "lstOpcoes", "-WantF2 Grid w800 NoSortHdr Sort r10 x+m", "Associação|Comando")
 					temComandos			:=	!temComandos
 				}
-				this.lstOpcoes.Items.Add("", commArr[1], commArr[2])
+				this.lstOpcoes.Items.Add("", chave, valor)
 			}
 		}
 		this.lstOpcoes.ModifyCol(1, "AutoHdr")
