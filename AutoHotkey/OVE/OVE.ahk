@@ -1,5 +1,5 @@
 ﻿;@Ahk2Exe-SetDescription Script que executa comandos customizados para os arquivos e pastas.
-;@Ahk2Exe-SetVersion 3.0.1.0
+;@Ahk2Exe-SetVersion 3.0.1.1
 ;@Ahk2Exe-SetName OVE
 ;@Ahk2Exe-SetCopyright Script feito por Rafael Teixeira.
 
@@ -57,8 +57,8 @@ class OVE {
 				if (SubStr(arquivo, -3) == ".lnk") {
 					; Em casos de atalhos do Windows, eu "abro" ele, para recuperar 
 					; o destino dele e os seus argumentos.
-					FileGetShortcut, %arquivoSanitizado%, destino, , argumentos
-					OVE.ExecutarComando(OVE.RecuperarComando(OVE.acao, destino), argumentos, destino)
+					FileGetShortcut, %arquivoSanitizado%, destino, diretorioTrabalho, argumentos
+					OVE.ExecutarComando(OVE.RecuperarComando(OVE.acao, destino), argumentos, destino, diretorioTrabalho)
 				} else{
 					OVE.ExecutarComando(OVE.RecuperarComando(OVE.acao, arquivoSanitizado), "", arquivoSanitizado)
 				}
@@ -226,7 +226,7 @@ class OVE {
 	}
 
 	; Esta é a função que efetivamente executará os comandos vindos das associações.
-	ExecutarComando(comando, argumentos, arquivo := ""){
+	ExecutarComando(comando, argumentos, arquivo := "", par_diretorio_trabalho := ""){
 		if (!OVE.EhComandoValido(comando))
 			return
 		;
@@ -242,10 +242,18 @@ class OVE {
 			if (arquivo == "")
 				Run, %comando%, , , outPID
 			else {
-				if (FileExist(arquivo) ~= "D")
+				if (par_diretorio_trabalho != "")
+				{
+					diretorioTrabalho	:= par_diretorio_trabalho
+				}
+				else if (FileExist(arquivo) ~= "D")
+				{
 					diretorioTrabalho	:= arquivo
+				}
 				else
+				{
 					SplitPath, arquivo, , diretorioTrabalho
+				}
 				;
 				Run, %comando%, %diretorioTrabalho%, , outPID
 			}
